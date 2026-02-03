@@ -465,6 +465,64 @@ nano ~/.ssh/authorized_keys
 # Paste each person's public key on a new line
 ```
 
+### Setting Up Shared Model Cache (Required for Multiple Users)
+
+**Important for classrooms:** If multiple students will run `person_detector.py` on the same Pi, you need to set up a shared model cache. Without this, only the first user can successfully run the script - other users will get "Permission denied" errors.
+
+#### The Problem
+
+By default, DepthAI downloads YOLO models to `/tmp` when you first run the script. The files get owned by the first user, and other users can't access them:
+
+```
+RuntimeError: filesystem error: cannot remove: Permission denied
+[/tmp/yolov6n-r2-288x512.rvc2.tar.xz/config.json]
+```
+
+#### The Solution
+
+The repository includes a setup script that creates a shared model cache accessible by all users:
+
+```bash
+# Copy the script to your Pi (from your local machine)
+scp setup_shared_model_cache.sh smartobjects1.local:~/
+
+# SSH into the Pi
+ssh smartobjects1.local
+
+# Make it executable and run it
+chmod +x ~/setup_shared_model_cache.sh
+sudo ~/setup_shared_model_cache.sh
+```
+
+**What the script does:**
+1. Creates `/opt/depthai-cache` with world-writable permissions (777)
+2. Sets the `DEPTHAI_ZOO_CACHE` environment variable system-wide
+3. Cleans up old cache files from `/tmp`
+
+#### After Running the Setup
+
+Each user needs to reload their environment to pick up the new variable:
+
+```bash
+# Option 1: Log out and back in (recommended)
+exit
+ssh smartobjects1.local
+
+# Option 2: Source the environment file (temporary for current session)
+source /etc/profile.d/depthai.sh
+```
+
+Now all users can run `person_detector.py` without permission errors. The YOLO model will be downloaded once to `/opt/depthai-cache` and shared by everyone.
+
+#### Verification
+
+Check that the environment variable is set:
+
+```bash
+echo $DEPTHAI_ZOO_CACHE
+# Should output: /opt/depthai-cache
+```
+
 ---
 
 ## Part 6: Quick Reference

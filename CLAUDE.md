@@ -472,6 +472,40 @@ sudo cp -r /home/pi/oak-projects /home/studentname/
 sudo chown -R studentname:studentname /home/studentname/oak-projects
 ```
 
+**Shared Model Cache (Required for Multiple Users):**
+
+When multiple users run `person_detector.py` on the same Pi, they will encounter permission errors if the shared model cache isn't configured:
+
+```
+RuntimeError: filesystem error: cannot remove: Permission denied
+[/tmp/yolov6n-r2-288x512.rvc2.tar.xz/config.json]
+```
+
+**Root Cause:** DepthAI downloads YOLO models to `/tmp` by default. First user owns the files, subsequent users can't access them.
+
+**Solution:** Run the `setup_shared_model_cache.sh` script (included in repository):
+
+```bash
+# Copy script to Pi
+scp setup_shared_model_cache.sh smartobjects1.local:~/
+
+# SSH into Pi and run it
+ssh smartobjects1.local
+chmod +x ~/setup_shared_model_cache.sh
+sudo ~/setup_shared_model_cache.sh
+```
+
+The script:
+1. Creates `/opt/depthai-cache` with 777 permissions (world-writable)
+2. Sets `DEPTHAI_ZOO_CACHE=/opt/depthai-cache` environment variable system-wide
+3. Cleans up old cache files from `/tmp`
+
+**After setup:** Users need to reload environment:
+- Log out and back in (recommended), OR
+- Run: `source /etc/profile.d/depthai.sh`
+
+Verify with: `echo $DEPTHAI_ZOO_CACHE` (should output: `/opt/depthai-cache`)
+
 ### VS Code Remote Development
 Recommended for code editing:
 1. Install "Remote - SSH" extension
