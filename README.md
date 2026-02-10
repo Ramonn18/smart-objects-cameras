@@ -19,32 +19,52 @@ This is a **template project** for building Discord bots that communicate with L
 
 **Note:** All three Raspberry Pis have VNC enabled, but only one user can hold the VNC desktop seat at a time. Multiple users can SSH in simultaneously.
 
-**Note for instructors:** If you need to set up new Pis from scratch, see [INITIAL_SETUP.md](INITIAL_SETUP.md).
+---
+
+## 🎒 Important for Students
+
+**The GitHub repository stays on YOUR LOCAL COMPUTER.** You do NOT clone it onto the Raspberry Pi.
+
+Instead, you:
+1. 📁 Clone and work with the repo on your laptop
+2. 📤 Copy only the Python files you need to the Pi using `scp`
+3. 🔐 Create your `.env` file with Discord tokens on the Pi
+4. ▶️ Run the scripts on the Pi
+
+**See [WORKFLOW.md](docs/WORKFLOW.md) for complete instructions and examples.**
+
+---
+
+**Note for instructors:**
+- If you need to set up new Pis from scratch, see [INITIAL_SETUP.md](docs/INITIAL_SETUP.md)
+- For camera bot token reference, see [CAMERA_BOT_TOKENS.md](docs/CAMERA_BOT_TOKENS.md) (instructor use only)
 
 ---
 
 ## 📚 Table of Contents
 
+### For Students
+
+- **[STUDENT_QUICKSTART.md](STUDENT_QUICKSTART.md)** - Start here! Quick setup and common commands
+- **[WORKFLOW.md](WORKFLOW.md)** - How to copy files from your laptop to the Pi
+
 ### Getting Started
 
 - [Part 1: Connecting to the Pis](#part-1-connecting-to-the-pis)
 - [Part 2: Person Detection Script](#part-2-person-detection-script)
-- [Part 3: Auto-Start on Boot (Optional)](#part-3-auto-start-on-boot-optional)
-
-### Configuration & Usage
-
-- [Part 4: WiFi Network Management](#part-4-wifi-network-management)
-- [Part 5: Multi-User Access](#part-5-multi-user-access)
-- [Part 6: Quick Reference](#part-6-quick-reference)
+- [Part 3: Auto-Start on Boot (Future)](#part-3-auto-start-on-boot-future)
+- [Part 4: Quick Reference](#part-4-quick-reference)
 
 ### Troubleshooting
 
-- [Common Issues](#troubleshooting)
+- [Troubleshooting](#troubleshooting)
 
-### Appendices
+### Additional Guides
 
-- [Appendix A: VS Code Remote Development](#appendix-a-vs-code-remote-development)
-- [Appendix B: Discord Notifications](#appendix-b-discord-notifications)
+- [WiFi Network Management](docs/wifi-management.md) - Switching between home and classroom networks
+- [Multi-User Access](docs/multi-user-access.md) - Collaborative work on shared Pis
+- [Discord Integration](docs/discord-integration.md) - Webhooks and bot setup
+- [VS Code Remote Development](#vs-code-remote-development) - Professional development environment
 
 ### Additional Resources
 
@@ -65,7 +85,7 @@ The Pis are already configured and ready to use! Here's how to connect.
 
 - SSH client (built into Mac/Linux, use PowerShell on Windows)
 - [RealVNC Viewer](https://www.realvnc.com/en/connect/download/viewer/) (optional, for desktop Pi GUI access)
-- [VS Code](https://code.visualstudio.com/) with Remote-SSH extension (recommended - see [Appendix A](#appendix-a-vs-code-remote-development))
+- [VS Code](https://code.visualstudio.com/) with Remote-SSH extension (recommended - see [VS Code Remote Development](#vs-code-remote-development))
 
 **Network:**
 
@@ -111,7 +131,7 @@ For graphical desktop access to any of the Pis:
 
 ### VS Code Remote SSH (Recommended)
 
-The best way to code on the Pi is using VS Code Remote-SSH extension. See **[Appendix A: VS Code Remote Development](#appendix-a-vs-code-remote-development)** for complete setup instructions.
+The best way to code on the Pi is using VS Code Remote-SSH extension. See **[VS Code Remote Development](#vs-code-remote-development)** for complete setup instructions.
 
 **Quick start:**
 1. Install VS Code and the "Remote - SSH" extension
@@ -223,310 +243,85 @@ cat -n ~/oak-projects/person_detection_20260201_143052.log
 
 ---
 
-## Part 3: Auto-Start on Boot (Optional)
+## Part 3: Auto-Start on Boot (Future)
 
-**Check if it's already running:**
+**Currently NOT implemented** - We're still in the exploratory phase!
 
-Your instructor may have already configured the person detector to auto-start. Check the status:
+Right now, you need to manually run `person_detector.py` each time you want to use the camera. This is intentional because we're still experimenting with different features and configurations.
 
-```bash
-sudo systemctl status person-detector
-```
+### When Would You Use Auto-Start?
 
-If you see **"Active: active (running)"**, the detector is already running in the background!
+Once you're confident about what a camera should do permanently (for example, "Camera 1 should always detect people in the classroom entrance"), you could set it up to auto-start on boot using systemd services.
 
-**To view live detection logs:**
+**Benefits of auto-start:**
+- Camera begins detecting as soon as Pi powers on
+- Automatically restarts if the script crashes
+- Runs in background without keeping terminal open
+- Useful for long-term deployments
 
-```bash
-journalctl -u person-detector -f
-```
+**Why we're NOT using it now:**
+- Still testing different detection settings
+- Trying different models and thresholds
+- Want flexibility to run different scripts
+- Need to experiment without conflicting processes
 
-Press `Ctrl+C` to stop viewing logs (the detector keeps running).
+### How to Set It Up (When Ready)
 
-### Controlling the Auto-Start Service
+If you eventually want a camera to auto-start, see [INITIAL_SETUP.md](INITIAL_SETUP.md) for systemd service configuration instructions.
 
-```bash
-# Start the service
-sudo systemctl start person-detector
+**Basic concept:**
+1. Create a systemd service file at `/etc/systemd/system/person-detector.service`
+2. Configure it to run your script with specific flags
+3. Enable it with `sudo systemctl enable person-detector`
+4. Camera will auto-start on every boot
 
-# Stop the service
-sudo systemctl stop person-detector
-
-# Restart the service
-sudo systemctl restart person-detector
-
-# Check status
-sudo systemctl status person-detector
-
-# Enable auto-start on boot
-sudo systemctl enable person-detector
-
-# Disable auto-start on boot
-sudo systemctl disable person-detector
-```
-
-### Configuring Auto-Start (Advanced)
-
-If you want to modify what runs on boot, edit the service file:
-
-```bash
-sudo nano /etc/systemd/system/person-detector.service
-```
-
-After making changes, reload and restart:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart person-detector
-```
-
-See [INITIAL_SETUP.md](INITIAL_SETUP.md) for full service configuration details.
+For now, just run scripts manually when you need them!
 
 ---
 
-## Part 4: WiFi Network Management
+## WiFi & Multi-User Access
 
-### Switching Between Networks (Home ↔ Classroom)
+### Need to switch networks?
 
-Modern Raspberry Pi OS uses **NetworkManager** for WiFi configuration. Here are the best methods:
+If you need to move your Pi between different WiFi networks (home ↔ classroom), see the complete guide:
 
-#### Method 1: Using nmtui (Recommended - Menu Interface)
+**📡 [WiFi Network Management](docs/wifi-management.md)**
 
-**Perfect for adding classroom WiFi before you get to class!**
-
-`nmtui` is a text-based menu interface that lets you add networks you're not currently connected to:
-
+Quick command to add a new network:
 ```bash
-# SSH into the Pi
 ssh orbit
-
-# Open NetworkManager Text UI
-sudo nmtui
+sudo nmtui  # Text menu to add WiFi networks
 ```
-
-**Steps in nmtui:**
-1. Select **"Activate a connection"** to see current networks, OR
-2. Select **"Edit a connection"** to add new networks
-3. To add a new WiFi network:
-   - Choose **"Add"**
-   - Select **"Wi-Fi"**
-   - Enter SSID: `ClassroomWiFi`
-   - Enter Password: `classpassword`
-   - Tab to **"OK"** and press Enter
-   - Tab to **"Back"** and press Enter
-4. Select **"Quit"**
-
-**Tip:** You can add as many networks as you want! The Pi will automatically connect to any available network you've saved.
-
-#### Method 2: Using nmcli (Command Line)
-
-Quick commands for adding and switching networks:
-
-```bash
-# List available WiFi networks
-nmcli device wifi list
-
-# Connect to a network (saves automatically - but requires network to be in range!)
-sudo nmcli device wifi connect "ClassroomWiFi" password "classpassword"
-
-# List saved connections
-nmcli connection show
-
-# Switch to a previously saved network
-nmcli connection up "ClassroomWiFi"
-
-# Delete a saved network
-sudo nmcli connection delete "OldNetwork"
-```
-
-**Note:** `nmcli device wifi connect` only works if the network is currently in range. To add a network you're not near, use `nmtui` instead!
-
-#### Method 3: Using raspi-config (Graphical Alternative)
-
-If you prefer a menu interface:
-
-```bash
-sudo raspi-config
-# Navigate: System Options → Wireless LAN
-# Enter new SSID and password
-# Reboot
-```
-
-#### Method 4: Check Current WiFi Settings
-
-```bash
-# See which network you're connected to
-nmcli device wifi
-
-# See detailed connection info
-nmcli connection show --active
-
-# See WiFi password for saved network
-sudo nmcli connection show "YourNetworkName" | grep psk
-```
-
-#### Emergency: Editing via SD Card (If Locked Out)
-
-If you can't connect to the Pi at all:
-
-1. Power off the Pi and remove SD card
-2. Insert SD card into your computer
-3. In the `boot` partition, create a file called `wpa_supplicant.conf`:
-
-   ```
-   country=US
-   ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-   update_config=1
-
-   network={
-       ssid="ClassroomWiFi"
-       psk="classpassword"
-   }
-   ```
-
-4. Save, eject SD card, and boot the Pi
-5. Once connected, the Pi will import this to NetworkManager
 
 ---
 
-## Part 5: Multi-User Access
+### Working with teammates?
 
-Multiple students can access the same Pi simultaneously for collaborative work.
+Multiple students can access the same Pi simultaneously! The camera automatically announces who's using it via Discord.
 
-### Important: One Camera = One Person Running the Script
+**👥 [Multi-User Access Guide](docs/multi-user-access.md)**
 
-**Key concept:** Each Pi has ONE camera. Only ONE person should run `person_detector.py` at a time.
-
-**Smart object feature:** When you run the script with `--discord`, the camera **automatically announces** who's using it!
-
-**Typical classroom workflow:**
-
-```bash
-# Student A runs the script:
-ssh orbit
-source /opt/oak-shared/venv/bin/activate
-python3 person_detector.py --discord
-
-# Discord automatically shows:
-# 🎥 **alice** is now running person_detector.py on **orbit**
-
-# Other students can simultaneously:
-# - SSH in and view/edit code via VS Code Remote
-# - Make their own copies: person_detector_bob.py
-# - Prepare changes for when it's their turn
-# - Watch the Discord channel to see who's using which camera
-
-# When Student A stops (Ctrl+C):
-# Discord automatically shows:
-# 📴 **alice** stopped person_detector.py on **orbit** - camera is free
-```
-
-**No manual coordination needed!** The camera announces itself automatically.
-
-### Best Practices for Shared Access
-
-1. **Check Discord before running:**
-   - The camera automatically announces who's using it
-   - **If no "camera is free" message recently**, check: `ps aux | grep person_detector.py`
-   - **Be considerate:** Don't run for hours - test and let others use it
-   - **Run with `--discord` flag** so others can see when you're done
-
-2. **Everyone can collaborate via code editing:**
-   - **Multiple people can SSH in simultaneously** to view/edit code
-   - **Use VS Code Remote SSH** - each person gets their own editing session
-   - **Create personal test scripts:**
-     ```bash
-     cd ~/oak-projects
-     cp person_detector.py person_detector_alice.py
-     cp person_detector.py person_detector_bob.py
-     # Edit your copy, test when camera is free
-     ```
-
-3. **Use Git for collaboration:**
-   - Work on your own branch: `git checkout -b feature/alice-zone-detection`
-   - Commit changes when you've tested them
-   - See [GIT_COLLABORATION.md](GIT_COLLABORATION.md) for strategies
-
-4. **Communication is essential:**
-   - Let teammates know before you run the detector
-   - Don't stop someone else's running script
-   - Use a shared Discord/Slack channel to coordinate
-   - If unsure, ask: "Is anyone using Camera 1?"
-
-### Adding Additional Users (Optional)
-
-If you want separate user accounts for each student:
-
-```bash
-# SSH into the Pi
-ssh orbit
-
-# Create new user
-sudo adduser alice
-
-# Add to required groups for camera access
-sudo usermod -aG video,gpio,i2c,spi alice
-
-# Copy project files to their home directory
-sudo cp -r /home/pi/oak-projects /home/alice/
-sudo chown -R alice:alice /home/alice/oak-projects
-
-# The new user can now log in (update SSH config with new username)
-ssh orbit  # (after updating SSH config User field)
-```
-
-### Adding Multiple SSH Keys to Shared Account
-
-If multiple people use the same Pi account:
-
-```bash
-# Person 1 adds their key (if SSH config is set up)
-ssh-copy-id orbit
-# Or: ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
-
-# Person 2 adds their key (doesn't overwrite Person 1's key)
-ssh-copy-id orbit
-# Or: ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
-
-# Or manually add keys
-ssh orbit
-nano ~/.ssh/authorized_keys
-# Paste each person's public key on a new line
-```
-
-### Shared Model Cache (Optional - For Development/Testing)
-
-**When is this needed?** If multiple students want to test their own personal copies of the script (e.g., `person_detector_alice.py`, `person_detector_bob.py`) at different times, they might encounter model cache permission errors.
-
-**The issue:** DepthAI downloads YOLO models to `/tmp` the first time the script runs. If Student A runs it first, the cache files are owned by Student A. When Student B tries to run their own test later, they get:
-
-```
-RuntimeError: filesystem error: cannot remove: Permission denied
-[/tmp/yolov6n-r2-288x512.rvc2.tar.xz/config.json]
-```
-
-**Solution (optional):** Your instructor can run the `setup_shared_model_cache.sh` script to create a shared cache directory accessible by all users:
-
-```bash
-# From instructor's computer
-scp setup_shared_model_cache.sh orbit:~/
-
-# SSH into the Pi and run
-ssh orbit
-chmod +x ~/setup_shared_model_cache.sh
-sudo ~/setup_shared_model_cache.sh
-
-# Students need to reload environment (log out and back in, or):
-source /etc/profile.d/depthai.sh
-```
-
-This creates `/opt/depthai-cache` that everyone can access, so the model only downloads once and is shared.
-
-**Note:** This is only necessary if you're doing individual testing. For typical collaborative work where one person runs the main script at a time, this isn't needed.
+Key points:
+- Only one person runs `person_detector.py` at a time
+- Everyone can SSH in and edit code simultaneously via VS Code
+- Camera auto-announces via Discord when someone starts/stops
 
 ---
 
-## Part 6: Quick Reference
+### Want Discord notifications?
+
+Set up webhooks or an interactive bot to get camera alerts and control detection remotely.
+
+**🤖 [Discord Integration Guide](docs/discord-integration.md)**
+
+Features:
+- Real-time detection alerts
+- Interactive commands (!status, !screenshot, !detect)
+- Multi-camera coordination
+
+---
+
+## Part 4: Quick Reference
 
 ### Useful Commands
 
@@ -543,10 +338,7 @@ python3 -c "import depthai as dai; device = dai.Device(); print(f'Device: {devic
 # Monitor system resources
 htop
 
-# Check service status
-sudo systemctl status person-detector
-
-# View detection logs
+# View detection logs (if using --log flag)
 ls -la ~/oak-projects/*.log
 tail -f ~/oak-projects/person_detection_*.log
 ```
@@ -655,17 +447,19 @@ sudo dphys-swapfile swapon
 ### Script Crashes on Startup
 
 ```bash
-# Check service logs
-journalctl -u person-detector -n 50
-
-# Test manually first
+# Run manually to see error messages
 activate-oak
 python3 ~/oak-projects/person_detector.py
+
+# If it crashes, check:
+# 1. Is the camera connected? (lsusb | grep Myriad)
+# 2. Is the virtual environment activated? (should see (venv) in prompt)
+# 3. Are all dependencies installed?
 ```
 
 ---
 
-## Appendix A: VS Code Remote Development
+## VS Code Remote Development
 
 VS Code Remote SSH is the **recommended** way to develop on the Raspberry Pi. This gives you a professional development environment on your laptop while the code executes on the Pi.
 
@@ -827,37 +621,6 @@ python3 person_detector.py
 
 ### VS Code Tips and Tricks
 
-#### SSH Key Authentication
-
-If you configured SSH keys during OS installation, VS Code will connect automatically without passwords!
-
-**If you need to add your key to the Pi:**
-
-**On Mac/Linux:**
-
-```bash
-# Generate key if you don't have one (with project-specific name)
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_smartobjects -C "your_email@example.com"
-
-# Copy to Pi (if SSH config is set up from Part 1)
-ssh-copy-id orbit
-
-# Or specify the key explicitly
-ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
-```
-
-**On Windows (PowerShell):**
-
-```powershell
-# Generate key if needed (with project-specific name)
-ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_ed25519_smartobjects -C "your_email@example.com"
-
-# Copy to Pi manually
-type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub | ssh orbit "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-```
-
-Now VS Code will connect without asking for a password!
-
 #### Useful Keyboard Shortcuts
 
 | Action          | Windows/Linux  | Mac           |
@@ -961,474 +724,18 @@ Make sure you:
 
 ---
 
-## Appendix B: Discord Notifications
-
-This appendix covers setting up Discord integration for real-time person detection alerts. There are **two options** available:
-
-### Option 1: Webhooks (Simpler, One-Way)
-- Real-time notifications in Discord when people are detected
-- Alerts when the area becomes clear
-- Timestamped messages showing detection events
-- No complex bot hosting required
-- **Best for:** Simple notifications only
-
-### Option 2: Discord Bot (Advanced, Two-Way)
-- Everything webhooks can do, plus:
-- Interactive commands (!status, !detect, !ping)
-- Query camera status from Discord
-- Bot runs on the Raspberry Pi
-- **Best for:** Interactive monitoring and control
-
-**This guide covers webhooks. For bot setup, see [DISCORD_BOT_PLAN.md](DISCORD_BOT_PLAN.md).**
-
----
-
-## Webhook Setup (Option 1)
-
-### What You'll Get
-
-- Real-time notifications in Discord when people are detected
-- Alerts when the area becomes clear
-- Timestamped messages showing detection events
-- No complex bot hosting required
-
----
-
-### Prerequisites
-
-- A Discord account
-- A Discord server where you have "Manage Webhooks" permission
-  - You can create your own server for free if needed
-
----
-
-### Step 1: Create a Discord Server (If Needed)
-
-If you already have a Discord server where you want notifications, skip to Step 2.
-
-#### Create Your Own Server
-
-1. Open Discord (desktop app or web)
-2. Click the **+** button in the left sidebar
-3. Select **Create My Own**
-4. Choose **For me and my friends** (or customize as needed)
-5. Name it something like "Camera Notifications" or "OAK-D Monitor"
-6. Click **Create**
-
----
-
-### Step 2: Create a Webhook
-
-A webhook is a special URL that allows the camera to send messages to Discord without running a full bot.
-
-#### Step-by-Step Instructions
-
-1. **Navigate to Server Settings**
-   - Right-click your Discord server name (top-left)
-   - Select **Server Settings**
-
-2. **Open Integrations**
-   - In the left sidebar, click **Integrations**
-
-3. **Create Webhook**
-   - Click **Webhooks** (or **View Webhooks** if webhooks already exist)
-   - Click **New Webhook** (or **Create Webhook**)
-
-4. **Configure the Webhook**
-   - **Name**: `OAK-D Camera` (or whatever you prefer)
-   - **Channel**: Select the channel where you want notifications
-     - You can create a dedicated channel like `#camera-alerts`
-   - **Icon** (optional): Upload a camera emoji or icon
-
-5. **Copy Webhook URL**
-   - Click **Copy Webhook URL** button
-   - **IMPORTANT**: Keep this URL secret! Anyone with this URL can send messages to your channel
-   - The URL looks like:
-     ```
-     https://discord.com/api/webhooks/1234567890/AbCdEfGhIjKlMnOpQrStUvWxYz...
-     ```
-
-6. **Save Changes**
-   - Click **Save Changes** at the bottom
-
----
-
-### Step 3: Configure the Camera System
-
-Now we'll tell the camera where to send notifications.
-
-#### On Your Raspberry Pi
-
-1. **SSH into your Pi**
-
-   ```bash
-   ssh orbit
-   # or
-   ssh gravity
-   # or
-   ssh horizon
-   ```
-
-2. **Navigate to the project directory**
-
-   ```bash
-   cd ~/oak-projects
-   ```
-
-3. **Create environment configuration file**
-
-   ```bash
-   nano .env
-   ```
-
-4. **Add the webhook URL**
-   Paste the following, replacing with your actual webhook URL:
-
-   ```bash
-   # Discord Webhook Configuration
-   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE
-   ```
-
-5. **Save the file**
-   - Press `Ctrl+O` then `Enter` to save
-   - Press `Ctrl+X` to exit
-
-6. **Secure the file** (so other users can't read your webhook)
-   ```bash
-   chmod 600 .env
-   ```
-
-#### Install Required Dependencies
-
-```bash
-# Activate shared virtual environment
-activate-oak
-
-# Install required packages (if not already installed during initial setup)
-pip install requests aiohttp python-dotenv
-```
-
----
-
-### Step 4: Test the Webhook
-
-Let's verify everything is working before integrating with the camera.
-
-```bash
-# Activate shared virtual environment if not already
-activate-oak
-
-# Run test notification
-python3 discord_notifier.py
-```
-
-**Expected output:**
-
-```
-🧪 Testing Discord notification...
-✅ Notification sent successfully!
-   Check your Discord channel to verify
-```
-
-**Check Discord** - You should see a message from "OAK-D Camera" with a test notification!
-
-#### Manual Test
-
-You can also send custom messages:
-
-```bash
-python3 discord_notifier.py "Hello from the camera system!"
-```
-
----
-
-### Step 5: Run the Camera with Discord Notifications
-
-Now that the webhook is configured, run the person detector:
-
-```bash
-# Activate shared virtual environment
-activate-oak
-
-# Run with Discord notifications
-python3 person_detector.py --discord
-
-# Or with logging
-python3 person_detector.py --discord --log
-
-# Or with video display (VNC Pi only)
-python3 person_detector.py --discord --display
-
-# Quiet mode (only notify on detection, not when area clears)
-python3 person_detector.py --discord --discord-quiet
-```
-
-You should now see Discord notifications when:
-
-- ✅ People are detected
-- ✅ The area clears (no people)
-- ✅ The system starts up
-- ✅ The system shuts down
-
----
-
-### Step 6: Auto-Start with Notifications (Optional)
-
-To have the camera automatically send notifications on boot, update the systemd service:
-
-```bash
-sudo nano /etc/systemd/system/person-detector.service
-```
-
-Make sure it looks like this:
-
-```ini
-[Unit]
-Description=OAK-D Person Detector with Discord Notifications
-After=network.target
-
-[Service]
-Type=simple
-User=carrie
-WorkingDirectory=/home/carrie/oak-projects
-EnvironmentFile=/home/carrie/oak-projects/.env
-ExecStart=/opt/oak-shared/venv/bin/python3 /home/carrie/oak-projects/person_detector.py --discord --log
-Restart=on-failure
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-**Note:** Replace `carrie` with your actual username.
-
-Key changes:
-
-- Added `EnvironmentFile=/home/carrie/oak-projects/.env` to load the webhook URL
-- Added `--discord` flag to enable notifications
-- Uses shared venv at `/opt/oak-shared/venv/`
-
-#### Reload and restart the service
-
-```bash
-# Reload systemd configuration
-sudo systemctl daemon-reload
-
-# Restart the service
-sudo systemctl restart person-detector
-
-# Check status
-sudo systemctl status person-detector
-
-# View logs
-journalctl -u person-detector -f
-```
-
----
-
-### Discord Customization
-
-#### Change Notification Settings
-
-Edit `person_detector.py` to customize what gets sent to Discord:
-
-```python
-# Example: Only notify on person detection (not when area clears)
-if person_detected and not last_status:
-    send_notification(f"🟢 PERSON DETECTED (count: {person_count})")
-    # Remove the "no person" notification
-```
-
-#### Change Username/Icon
-
-Modify calls in `person_detector.py`:
-
-```python
-send_notification(
-    "🟢 PERSON DETECTED",
-    username="Security Camera 1"
-)
-```
-
-#### Disable Timestamps
-
-```python
-send_notification("Message here", add_timestamp=False)
-```
-
----
-
-### Discord Troubleshooting
-
-#### "DISCORD_WEBHOOK_URL not set" Error
-
-**Problem**: The `.env` file isn't being loaded or doesn't exist.
-
-**Solutions**:
-
-1. Make sure you created `.env` in `~/oak-projects/`
-2. Check the file contents: `cat ~/oak-projects/.env`
-3. Ensure `python-dotenv` is installed: `pip install python-dotenv`
-
-#### "Notification failed: 404" Error
-
-**Problem**: The webhook URL is incorrect or the webhook was deleted.
-
-**Solutions**:
-
-1. Go back to Discord → Server Settings → Integrations → Webhooks
-2. Verify the webhook still exists
-3. Copy the URL again and update `.env`
-4. Make sure there are no extra spaces in the `.env` file
-
-#### "Notification timed out" Error
-
-**Problem**: Network connectivity issue between Pi and Discord.
-
-**Solutions**:
-
-1. Check internet connection: `ping discord.com`
-2. Check Pi's network settings
-3. Try the test script again: `python3 discord_notifier.py`
-
-#### Messages Not Appearing in Discord
-
-**Checklist**:
-
-- [ ] Webhook exists in Discord settings
-- [ ] Webhook points to correct channel
-- [ ] `.env` file has correct URL
-- [ ] Test script works: `python3 discord_notifier.py`
-- [ ] Virtual environment is activated
-- [ ] `requests` and `python-dotenv` are installed
-
-#### Permission Issues with .env File
-
-```bash
-# Fix file permissions
-chmod 600 ~/oak-projects/.env
-
-# Verify ownership
-ls -la ~/oak-projects/.env
-# Should show: -rw------- 1 [user] [user] ...
-```
-
----
-
-### Security Best Practices
-
-#### Keep Your Webhook Secret
-
-- ✅ **DO**: Store webhook URL in `.env` file with restricted permissions
-- ✅ **DO**: Add `.env` to `.gitignore` if using version control
-- ❌ **DON'T**: Share webhook URL publicly
-- ❌ **DON'T**: Commit `.env` to GitHub/Git repositories
-- ❌ **DON'T**: Post webhook URL in Discord or other public places
-
-#### Regenerate Webhook If Leaked
-
-If your webhook URL is accidentally exposed:
-
-1. Go to Discord → Server Settings → Integrations → Webhooks
-2. Find your webhook
-3. Click the webhook name
-4. Scroll to bottom and click **Delete Webhook**
-5. Create a new webhook (follow Step 2 again)
-6. Update `.env` with new URL
-
----
-
-### Using Multiple Cameras
-
-If you have multiple cameras (multiple Pis), you can:
-
-#### Option 1: Different Webhooks (Different Channels)
-
-Create separate webhooks for each camera:
-
-```bash
-# On Pi 1
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/camera1_webhook
-
-# On Pi 2
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/camera2_webhook
-```
-
-#### Option 2: Same Webhook (Same Channel) with Different Names
-
-Use the same webhook but different usernames:
-
-```python
-# On Pi 1
-send_notification("Person detected", username="Camera 1 - Front Door")
-
-# On Pi 2
-send_notification("Person detected", username="Camera 2 - Backyard")
-```
-
----
-
-## Extending This Template - Interactive Smart Objects
-
-This template is designed for **real-time collaboration with cameras as smart objects**. The key idea: you should be able to command, reconfigure, and coordinate cameras dynamically through Discord.
-
-### 🎮 Interactive Control Ideas
-
-**Dynamic Reconfiguration:**
-- Add `!set-threshold 0.7` - Change detection sensitivity in real-time
-- Add `!detect-mode person` or `!detect-mode car` - Switch what the camera looks for
-- Add `!toggle-notifications` - Turn alerts on/off without restarting
-- Add `!set-fps 30` - Adjust camera frame rate on the fly
-
-**Physical Coordination:**
-- Add `!request-move "point at door"` - Ask someone to reposition the camera
-- Add `!camera-location "classroom-front"` - Track where cameras are pointed
-- Multiple people collaborate to position cameras optimally
-
-**Multi-Camera Orchestration:**
-- `!camera1 detect-person` and `!camera2 detect-car` - Different cameras, different jobs
-- `!coordinate-all` - All cameras switch to the same detection mode
-- `!status-all` - See what every camera is currently doing
-- Cameras report to you when they need adjustment or repositioning
-
-**Live Experimentation:**
-- Change models without SSH: `!use-model yolov8-nano`
-- Toggle features: `!enable-zones`, `!disable-debouncing`
-- A/B test different configurations across cameras
-- Students suggest changes via Discord, camera responds
-
-**Rich Communication:**
-- Create custom Discord embeds with rich formatting
-- Add database logging for detection history
-- Implement scheduled reports: `!daily-summary`, `!weekly-stats`
-- Video recording on demand: `!record 30` (record 30 seconds)
-- Automatic video clips when interesting events occur
-
-### 💡 The Core Concept
-
-Think of cameras as **responsive team members**, not just sensors:
-- They can be asked to change what they're doing
-- They respond to commands immediately
-- Multiple cameras can coordinate their sensing
-- Physical repositioning is part of the interaction
-- Configuration changes happen through conversation, not SSH
-
-This makes experimentation fast and collaborative - you're having a dialog with your smart objects, not just configuring them once and watching passively.
-
----
-
 ## Next Steps
 
 Once basic detection is working, you might want to explore:
 
-1. **Discord Bot Integration** — Set up interactive bot for two-way communication
-   - Follow [DISCORD_BOT_PLAN.md](DISCORD_BOT_PLAN.md) for complete setup guide
-   - Query camera status with commands like !status, !detect, !ping
+1. **Discord Integration** — Set up webhooks or interactive bot
+   - See [Discord Integration Guide](docs/discord-integration.md) for complete setup
+   - Get real-time detection alerts and control cameras with commands
 
 2. **Different models** — Try other YOLO models from Luxonis Hub
    - Browse models at https://models.luxonis.com
-   - Change model reference in person_detector.py `--model` argument
-   - Example: `--model luxonis/yolov8-nano:r2-coco-640x640`
+   - Change model with `--model` argument
+   - Example: `python3 person_detector.py --model luxonis/yolov8-nano:r2-coco-640x640`
 
 3. **Depth integration** — Get distance to detected persons
    - Use `depthai-nodes` spatial detection features
@@ -1438,11 +745,11 @@ Once basic detection is working, you might want to explore:
    - Use DepthAI 3.x VideoEncoder node
    - See examples in depthai-python repository
 
-5. **Notifications** — See Appendix B for Discord webhook setup
+5. **Web dashboard** — Flask/FastAPI server to view status remotely
 
-6. **Web dashboard** — Flask/FastAPI server to view status remotely
-
-7. **Multiple cameras** — Run detection on multiple OAK-D cameras
+6. **Multiple cameras** — Run detection on multiple OAK-D cameras
+   - Coordinate them via Discord commands
+   - See [Discord Integration Guide](docs/discord-integration.md) for multi-camera ideas
 
 **Resources for learning more:**
 - **DepthAI 3.x Documentation**: https://docs.luxonis.com/software-v3/depthai/

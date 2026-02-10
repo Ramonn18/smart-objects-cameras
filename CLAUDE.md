@@ -515,30 +515,19 @@ sudo cp -r /home/pi/oak-projects /home/studentname/
 sudo chown -R studentname:studentname /home/studentname/oak-projects
 ```
 
-**Shared Model Cache (Optional - Development Scenario Only):**
+**Shared Resources (Already Configured):**
 
-**When needed:** Only if multiple students want to test personal script copies (`person_detector_alice.py`, etc.) at different times and encounter:
+The following shared resources have been set up on all three Pis:
 
-```
-RuntimeError: filesystem error: cannot remove: Permission denied
-[/tmp/yolov6n-r2-288x512.rvc2.tar.xz/config.json]
-```
+1. **Shared Model Cache**: `/opt/depthai-cache`
+   - DepthAI models download once and are accessible to all users
+   - Prevents permission errors when multiple students test their own script copies
 
-**Root Cause:** DepthAI downloads YOLO models to `/tmp` by default. First user owns the files, subsequent users testing later can't access them.
+2. **Shared Oak Examples**: `/opt/oak-shared/oak-examples/`
+   - Luxonis example code (neural networks, depth, tutorials, etc.)
+   - Symlinked to `~/oak-examples/` in each user's home directory
 
-**Solution (optional):** Run the `setup_shared_model_cache.sh` script (included in repository):
-
-```bash
-# Copy script to Pi and run with sudo
-scp setup_shared_model_cache.sh orbit:~/
-ssh orbit
-chmod +x ~/setup_shared_model_cache.sh
-sudo ~/setup_shared_model_cache.sh
-```
-
-Creates `/opt/depthai-cache` (777) with `DEPTHAI_ZOO_CACHE` environment variable system-wide.
-
-**Note:** For typical collaborative work where one person runs the main script at a time, this isn't necessary. The model cache is only an issue when different users independently test their own script copies.
+**For setup details** (instructors only), see `docs/archive/multi-user-setup.md`
 
 ### VS Code Remote Development
 Recommended for code editing:

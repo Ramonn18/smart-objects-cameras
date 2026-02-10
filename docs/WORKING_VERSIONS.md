@@ -70,12 +70,11 @@ sudo /opt/oak-shared/venv/bin/pip install Qt.py
 
 ### Shared Model Cache Setup
 
-```bash
-# Run the setup script from the repository
-sudo bash setup_shared_model_cache.sh
-```
+**Already configured on all three Pis!**
 
-This creates `/opt/depthai-cache` and sets `DEPTHAI_ZOO_CACHE` environment variable system-wide.
+The shared model cache (`/opt/depthai-cache`) and environment variable (`DEPTHAI_ZOO_CACHE`) have been set up system-wide.
+
+**For setup details** (instructors only), see `docs/archive/multi-user-setup.md` and `docs/archive/setup_shared_model_cache.sh`
 
 ### User Aliases (Optional but Recommended)
 

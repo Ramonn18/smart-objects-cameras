@@ -247,8 +247,8 @@ ssh-copy-id orbit
 ## ❓ Getting Help
 
 1. Check the full `README.md` for detailed instructions
-2. Check `README.md` Appendix A for VS Code Remote setup
-3. Check `README.md` Appendix B for Discord notifications
+2. Check `docs/STUDENT_QUICKSTART.md` for student-specific setup
+3. Check `docs/discord-integration.md` for Discord notifications
 4. Ask your instructor
 5. Search Luxonis Discord / GitHub issues
 
