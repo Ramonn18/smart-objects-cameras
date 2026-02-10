@@ -1146,27 +1146,29 @@ Your instructor has provided you with access to Claude Code! You can use it in t
 
 First, install Claude Code on your laptop (do this once):
 
-**Prerequisites:** You need Node.js/npm installed. If you don't have it:
-
-- **Mac:** `brew install node` or download from https://nodejs.org
-- **Windows:** Download from https://nodejs.org
-- **Linux:** `sudo apt install nodejs npm` or use your package manager
-
-**Install Claude Code:**
+**For Mac users (Recommended):**
 
 ```bash
-# On Mac/Linux:
-npm install -g @anthropic-ai/claude-code
-
-# Or using Homebrew (Mac only):
+# Install using Homebrew (you already have brew from last semester!)
 brew install anthropic-ai/tap/claude-code
-
-# On Windows (PowerShell):
-npm install -g @anthropic-ai/claude-code
 
 # Verify installation:
 claude --version
 ```
+
+**For Mac/Linux users (Alternative - using curl):**
+
+```bash
+# Install using curl
+curl -fsSL https://cli.anthropic.com/install.sh | sh
+
+# Verify installation:
+claude --version
+```
+
+**For Windows users:**
+
+Download the installer from https://cli.anthropic.com or use the curl command in PowerShell if available.
 
 **First time setup:**
 When you run `claude` for the first time, it will ask you to authenticate with your Anthropic account (your instructor set this up for you).
@@ -1315,12 +1317,13 @@ Please reference specific line numbers and functions in your explanation.
 ```
 I'm working on a Smart Objects camera project (see system details above).
 
-I want to modify person_detector_with_display.py to:
-- Detect multiple object types (people, cars, and dogs)
+I want to create a modified version of person_detector_with_display.py that:
+- Detects multiple object types (people, cars, and dogs)
 - Display different colored bounding boxes for each type
 - Log when each type is detected
 
-Can you show me how to modify the code? Please provide the specific changes with line numbers.
+Please create a new file called person_detector_multiclass_myname.py with these changes.
+Keep the original file intact so I can refer back to it.
 ```
 
 **Adding Discord features:**
@@ -1367,6 +1370,29 @@ What's causing this error and how can I fix it?
 **⚠️ CRITICAL: Always Review Changes Before Accepting**
 
 Your instructor emphasized this in class, but it's worth repeating:
+
+**💡 Best Practice: Make a New File for Your Changes**
+
+When asking Claude Code to modify an existing file, ask it to create a **new file** with your name in it instead of changing the original:
+
+```bash
+claude
+> I want to modify person_detector_with_display.py to also detect cars.
+  Please create a new file called person_detector_with_display_alice.py with these changes,
+  so I can keep the original file as reference.
+```
+
+**Why this is smart:**
+- ✅ You keep the working original file intact
+- ✅ You can always go back to the original if something breaks
+- ✅ Easy to compare your changes to the original
+- ✅ You can identify which files are yours at a glance
+- ✅ Multiple students can have their own versions without conflicts
+
+**Example naming:**
+- `person_detector_with_display_alice.py`
+- `fatigue_detector_bob.py`
+- `gaze_detector_improved_charlie.py`
 
 **What to watch for when Claude Code proposes changes:**
 
@@ -1445,12 +1471,16 @@ claude
 
 ```bash
 claude
-> Modify person_detector_with_display.py to save screenshots every 10 seconds instead of 5
+> Create a new file called person_detector_myname.py that saves screenshots
+  every 10 seconds instead of 5. Base it on person_detector_with_display.py
 
-> Add a command line argument to change the model at runtime
+> I want to add a command line argument to change the model at runtime.
+  Create a new file called person_detector_flexible_myname.py with this feature.
 
 > Fix this error: [paste error message]
 ```
+
+**Pro tip:** Always ask Claude to create a NEW file with your name when making changes, so you keep the original as a working reference!
 
 **Working with the Pi:**
 
