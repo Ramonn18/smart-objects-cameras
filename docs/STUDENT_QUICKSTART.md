@@ -1,5 +1,24 @@
 # Student Quick Start Guide
 
+## 🎯 Quick Start Checklist
+
+Follow these steps in order. Check them off as you complete them!
+
+- [ ] **Step 1:** Clone the GitHub repo to your laptop ([jump to section](#important-github-repo-location))
+- [ ] **Step 2:** Set up SSH access to your Pi ([jump to section](#getting-started))
+- [ ] **Step 3:** Copy Python files from your laptop to the Pi ([jump to section](#step-1-copy-python-files-from-your-computer-to-the-pi))
+- [ ] **Step 4:** Check/create your `.env` file on the Pi ([jump to section](#step-2-create-your-environment-file-env))
+- [ ] **Step 5:** Run your first detector! ([jump to section](#running-fatigue-detection))
+- [ ] **Step 6 (Optional):** Set up personal DM bot for notifications ([jump to section](#running-multiple-things-at-once-important))
+
+**Estimated time:** 20-30 minutes for first-time setup
+
+**Most common starting points:**
+- ⭐ **Fatigue Detection** - Eye tracking with personal DM notifications
+- ⭐ **Gaze Estimation** - See where someone is looking
+
+---
+
 ## Before You Start: Terminal Basics
 
 ### How to Tell Where You Are (Local Computer vs. Raspberry Pi)
