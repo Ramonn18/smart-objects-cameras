@@ -14,6 +14,7 @@ Follow these steps in order. Check them off as you complete them!
 **Estimated time:** 20-30 minutes for first-time setup
 
 **Most common starting points:**
+
 - ⭐ **Fatigue Detection** - Eye tracking with personal DM notifications
 - ⭐ **Gaze Estimation** - See where someone is looking
 
@@ -164,12 +165,14 @@ git pull
 ```
 
 **What this does:**
+
 - `git checkout main` - Switches to the main branch (if you're not already there)
 - `git pull` - Downloads the latest changes from GitHub and updates your files
 
 **If you see errors:**
 
 **Error: "You have local changes"**
+
 ```
 error: Your local changes to the following files would be overwritten by merge:
     some_file.py
@@ -177,6 +180,7 @@ Please commit your changes or stash them before you merge.
 ```
 
 **Solution:** Save your changes temporarily:
+
 ```bash
 # Save your changes
 git stash
@@ -190,6 +194,7 @@ git stash pop
 
 **Error: "fatal: not a git repository"**
 This means you're not in the right folder. Use `cd` to navigate to where you cloned the repo, or clone it fresh if you deleted it:
+
 ```bash
 git clone https://github.com/[your-org]/smart-objects-cameras.git
 cd smart-objects-cameras
@@ -299,10 +304,25 @@ Or simply **drag and drop** files from your local VS Code to the remote VS Code 
 First, SSH into the Pi from your local computer, then check if `.env` already exists:
 
 ```bash
-# Run this on YOUR LOCAL COMPUTER to connect to the Pi:
+# From your local computer - connect to a Pi:
 ssh orbit
+```
 
-# Now you're on the Pi - check if .env exists:
+or
+
+```bash
+ssh gravity
+```
+
+or
+
+```bash
+ssh horizon
+```
+
+Now you're on the Pi! Check if .env exists:
+
+```bash
 ls ~/oak-projects/.env
 ```
 
@@ -386,9 +406,19 @@ DISCORD_BOT_TOKEN=get_from_instructor_for_your_pi
 Before you can connect to the Pis, make sure your SSH config is set up. Test it:
 
 ```bash
-# Connect to any of the three cameras
+# Connect to one of the three cameras
 ssh orbit
+```
+
+or
+
+```bash
 ssh gravity
+```
+
+or
+
+```bash
 ssh horizon
 ```
 
@@ -662,9 +692,25 @@ When you run a script (like `python3 fatigue_detector.py`), it takes over that t
 **⚠️ On YOUR LOCAL COMPUTER, SSH to the Pi, then run commands on the Pi:**
 
 ```bash
-# From local computer - connect to Pi:
+# From local computer - connect to a Pi:
 ssh orbit
+```
 
+or
+
+```bash
+ssh gravity
+```
+
+or
+
+```bash
+ssh horizon
+```
+
+Now you're on the Pi! Run the detector:
+
+```bash
 # Now on Pi - run the detector:
 activate-oak
 cd ~/oak-projects
@@ -678,9 +724,25 @@ This window shows fatigue detection logs and stays open.
 **⚠️ On YOUR LOCAL COMPUTER, SSH to the Pi, then run commands on the Pi:**
 
 ```bash
-# From local computer - connect to Pi:
+# From local computer - connect to a Pi:
 ssh orbit
+```
 
+or
+
+```bash
+ssh gravity
+```
+
+or
+
+```bash
+ssh horizon
+```
+
+Now you're on the Pi! Run the DM bot:
+
+```bash
 # Now on Pi - run the DM bot:
 activate-oak
 cd ~/oak-projects
@@ -700,9 +762,25 @@ Now both are running! The detector sends fatigue alerts to your DMs.
 **⚠️ On YOUR LOCAL COMPUTER, SSH to the Pi, then run commands on the Pi:**
 
 ```bash
-# From local computer - connect to Pi:
+# From local computer - connect to a Pi:
 ssh orbit
+```
 
+or
+
+```bash
+ssh gravity
+```
+
+or
+
+```bash
+ssh horizon
+```
+
+Now you're on the Pi! Run the detector:
+
+```bash
 # Now on Pi - run the detector:
 activate-oak
 cd ~/oak-projects
@@ -722,9 +800,25 @@ python3 gaze_detector.py --display
 **⚠️ On YOUR LOCAL COMPUTER, SSH to the Pi, then run commands on the Pi:**
 
 ```bash
-# From local computer - connect to Pi:
+# From local computer - connect to a Pi:
 ssh orbit
+```
 
+or
+
+```bash
+ssh gravity
+```
+
+or
+
+```bash
+ssh horizon
+```
+
+Now you're on the Pi! Run the detector:
+
+```bash
 # Now on Pi - run the detector:
 activate-oak
 cd ~/oak-projects
@@ -736,9 +830,25 @@ python3 person_detector_with_display.py
 **⚠️ On YOUR LOCAL COMPUTER, SSH to the Pi, then run commands on the Pi:**
 
 ```bash
-# From local computer - connect to Pi:
+# From local computer - connect to a Pi:
 ssh orbit
+```
 
+or
+
+```bash
+ssh gravity
+```
+
+or
+
+```bash
+ssh horizon
+```
+
+Now you're on the Pi! Run the DM bot:
+
+```bash
 # Now on Pi - run the DM bot:
 activate-oak
 cd ~/oak-projects
@@ -1402,6 +1512,7 @@ claude
 ```
 
 **Why this is smart:**
+
 - ✅ You keep the working original file intact
 - ✅ You can always go back to the original if something breaks
 - ✅ Easy to compare your changes to the original
@@ -1409,6 +1520,7 @@ claude
 - ✅ Multiple students can have their own versions without conflicts
 
 **Example naming:**
+
 - `person_detector_with_display_alice.py`
 - `fatigue_detector_bob.py`
 - `gaze_detector_improved_charlie.py`
