@@ -391,37 +391,65 @@ If you can't connect to the Pi at all:
 
 Multiple students can access the same Pi simultaneously for collaborative work.
 
+### Important: One Camera = One Person Running the Script
+
+**Key concept:** Each Pi has ONE camera. Only ONE person should run `person_detector.py` at a time.
+
+**Smart object feature:** When you run the script with `--discord`, the camera **automatically announces** who's using it!
+
+**Typical classroom workflow:**
+
+```bash
+# Student A runs the script:
+ssh smartobjects1.local
+source /opt/oak-shared/venv/bin/activate
+python3 person_detector.py --discord
+
+# Discord automatically shows:
+# 🎥 **alice** is now running person_detector.py on **smartobjects1**
+
+# Other students can simultaneously:
+# - SSH in and view/edit code via VS Code Remote
+# - Make their own copies: person_detector_bob.py
+# - Prepare changes for when it's their turn
+# - Watch the Discord channel to see who's using which camera
+
+# When Student A stops (Ctrl+C):
+# Discord automatically shows:
+# 📴 **alice** stopped person_detector.py on **smartobjects1** - camera is free
+```
+
+**No manual coordination needed!** The camera announces itself automatically.
+
 ### Best Practices for Shared Access
 
-1. **Use SSH keys for each person:**
+1. **Check Discord before running:**
+   - The camera automatically announces who's using it
+   - **If no "camera is free" message recently**, check: `ps aux | grep person_detector.py`
+   - **Be considerate:** Don't run for hours - test and let others use it
+   - **Run with `--discord` flag** so others can see when you're done
 
-   ```bash
-   # Each student adds their SSH key to the Pi
-   # If you set up SSH config, this works automatically:
-   ssh-copy-id smartobjects1.local
+2. **Everyone can collaborate via code editing:**
+   - **Multiple people can SSH in simultaneously** to view/edit code
+   - **Use VS Code Remote SSH** - each person gets their own editing session
+   - **Create personal test scripts:**
+     ```bash
+     cd ~/oak-projects
+     cp person_detector.py person_detector_alice.py
+     cp person_detector.py person_detector_bob.py
+     # Edit your copy, test when camera is free
+     ```
 
-   # Or specify your key explicitly:
-   ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub smartobjects1.local
-   ```
+3. **Use Git for collaboration:**
+   - Work on your own branch: `git checkout -b feature/alice-zone-detection`
+   - Commit changes when you've tested them
+   - See [GIT_COLLABORATION.md](GIT_COLLABORATION.md) for strategies
 
-2. **Create personal script copies:**
-
-   ```bash
-   # Avoid editing the same file simultaneously
-   cd ~/oak-projects
-   cp person_detector.py person_detector_alice.py
-   cp person_detector.py person_detector_bob.py
-   ```
-
-3. **Use VS Code Remote SSH:**
-   - Each student can connect with their own VS Code instance
-   - VS Code will warn if someone else is editing the same file
-   - Coordinate with teammates before editing shared files
-
-4. **Communication is key:**
-   - Let teammates know before you restart services
-   - Don't stop/restart the camera while someone else is testing
-   - Use a shared chat or Discord channel to coordinate
+4. **Communication is essential:**
+   - Let teammates know before you run the detector
+   - Don't stop someone else's running script
+   - Use a shared Discord/Slack channel to coordinate
+   - If unsure, ask: "Is anyone using Camera 1?"
 
 ### Adding Additional Users (Optional)
 
@@ -463,6 +491,36 @@ ssh smartobjects1.local
 nano ~/.ssh/authorized_keys
 # Paste each person's public key on a new line
 ```
+
+### Shared Model Cache (Optional - For Development/Testing)
+
+**When is this needed?** If multiple students want to test their own personal copies of the script (e.g., `person_detector_alice.py`, `person_detector_bob.py`) at different times, they might encounter model cache permission errors.
+
+**The issue:** DepthAI downloads YOLO models to `/tmp` the first time the script runs. If Student A runs it first, the cache files are owned by Student A. When Student B tries to run their own test later, they get:
+
+```
+RuntimeError: filesystem error: cannot remove: Permission denied
+[/tmp/yolov6n-r2-288x512.rvc2.tar.xz/config.json]
+```
+
+**Solution (optional):** Your instructor can run the `setup_shared_model_cache.sh` script to create a shared cache directory accessible by all users:
+
+```bash
+# From instructor's computer
+scp setup_shared_model_cache.sh smartobjects1.local:~/
+
+# SSH into the Pi and run
+ssh smartobjects1.local
+chmod +x ~/setup_shared_model_cache.sh
+sudo ~/setup_shared_model_cache.sh
+
+# Students need to reload environment (log out and back in, or):
+source /etc/profile.d/depthai.sh
+```
+
+This creates `/opt/depthai-cache` that everyone can access, so the model only downloads once and is shared.
+
+**Note:** This is only necessary if you're doing individual testing. For typical collaborative work where one person runs the main script at a time, this isn't needed.
 
 ---
 

@@ -446,17 +446,36 @@ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
 # Add network blocks with priority settings
 ```
 
-### Multi-User Access
-Multiple students/developers can access the same Pi simultaneously.
+### Multi-User Access and Coordination
+
+**Critical concept:** Each Pi has ONE camera. Only ONE person should run `person_detector.py` at a time.
+
+**Smart Object Feature:** The camera **automatically announces** who's using it when run with `--discord`:
+- **Startup:** `🎥 **alice** is now running person_detector.py on **smartobjects1**`
+- **Shutdown:** `📴 **alice** stopped person_detector.py on **smartobjects1** - camera is free`
+- **Status file includes:** Username and hostname (`camera_status.json`)
+
+**Collaboration Model:**
+- **One person runs the detector** - Camera auto-announces via Discord (no manual coordination needed)
+- **Everyone else can SSH in** - View/edit code simultaneously via VS Code Remote
+- **Create personal test copies** - `person_detector_alice.py`, `person_detector_bob.py`
+- **Check Discord to see who's using camera** - Or check: `ps aux | grep person_detector.py`
+
+**Implementation Details:**
+The script captures username (`getpass.getuser()`) and hostname (`socket.gethostname()`) at startup and includes them in:
+1. Discord startup/shutdown notifications
+2. Status file (`camera_status.json`) - adds `username` and `hostname` fields
+3. Discord bot can display who's currently running the detector
 
 **Best Practices:**
-- Use VS Code Remote SSH for individual editing sessions
-- Create personal copies of scripts to avoid conflicts:
+- Always run with `--discord` flag so others know when camera is free
+- Check Discord channel before starting to see if camera is in use
+- Use VS Code Remote SSH for individual editing sessions (multiple people can edit different files)
+- Create personal script copies to test later:
   ```bash
   cp person_detector.py person_detector_yourname.py
   ```
-- Coordinate with team members when editing shared files
-- Use version control (Git) for collaborative development
+- Use Git branches for feature development (see `GIT_COLLABORATION.md`)
 - Each user should add their SSH key to `~/.ssh/authorized_keys`
 
 **Adding Multiple Users (Optional):**
@@ -471,6 +490,31 @@ sudo usermod -aG video,gpio,i2c,spi studentname
 sudo cp -r /home/pi/oak-projects /home/studentname/
 sudo chown -R studentname:studentname /home/studentname/oak-projects
 ```
+
+**Shared Model Cache (Optional - Development Scenario Only):**
+
+**When needed:** Only if multiple students want to test personal script copies (`person_detector_alice.py`, etc.) at different times and encounter:
+
+```
+RuntimeError: filesystem error: cannot remove: Permission denied
+[/tmp/yolov6n-r2-288x512.rvc2.tar.xz/config.json]
+```
+
+**Root Cause:** DepthAI downloads YOLO models to `/tmp` by default. First user owns the files, subsequent users testing later can't access them.
+
+**Solution (optional):** Run the `setup_shared_model_cache.sh` script (included in repository):
+
+```bash
+# Copy script to Pi and run with sudo
+scp setup_shared_model_cache.sh smartobjects1.local:~/
+ssh smartobjects1.local
+chmod +x ~/setup_shared_model_cache.sh
+sudo ~/setup_shared_model_cache.sh
+```
+
+Creates `/opt/depthai-cache` (777) with `DEPTHAI_ZOO_CACHE` environment variable system-wide.
+
+**Note:** For typical collaborative work where one person runs the main script at a time, this isn't necessary. The model cache is only an issue when different users independently test their own script copies.
 
 ### VS Code Remote Development
 Recommended for code editing:

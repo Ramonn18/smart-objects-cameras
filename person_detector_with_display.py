@@ -9,6 +9,7 @@ Usage:
     python3 person_detector.py              # Basic detection
     python3 person_detector.py --log        # Log to file
     python3 person_detector.py --discord    # Enable Discord notifications
+    python3 person_detector.py --display    # Show live detection window
 """
 
 import depthai as dai
@@ -49,6 +50,8 @@ parser.add_argument('--discord', action='store_true',
                     help='Enable Discord notifications')
 parser.add_argument('--discord-quiet', action='store_true',
                     help='Only send Discord notifications for person detected (not when clear)')
+parser.add_argument('--display', action='store_true',
+                    help='Show live detection window with bounding boxes')
 parser.add_argument('--model', type=str, default='luxonis/yolov6-nano:r2-coco-512x288',
                     help='Model reference from Luxonis Hub')
 args = parser.parse_args()
@@ -128,6 +131,39 @@ def update_status_file(detected: bool, count: int, running: bool = True, usernam
         log_event(f"WARNING: Could not update status file: {e}")
 
 
+def draw_detections(frame, detections, frame_width, frame_height):
+    """Draw bounding boxes and labels on frame."""
+    for detection in detections:
+        # Get normalized coordinates (0-1)
+        x1 = detection.xmin
+        y1 = detection.ymin
+        x2 = detection.xmax
+        y2 = detection.ymax
+
+        # Convert to pixel coordinates
+        x1 = int(x1 * frame_width)
+        y1 = int(y1 * frame_height)
+        x2 = int(x2 * frame_width)
+        y2 = int(y2 * frame_height)
+
+        # Draw bounding box
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        # Draw label with confidence
+        label = f"Person {detection.confidence:.2f}"
+        label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+
+        # Draw label background
+        cv2.rectangle(frame, (x1, y1 - label_size[1] - 10),
+                     (x1 + label_size[0], y1), (0, 255, 0), -1)
+
+        # Draw label text
+        cv2.putText(frame, label, (x1, y1 - 5),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+
+    return frame
+
+
 def run_detection():
     """Main detection loop using DepthAI 3.x."""
     global log_file, last_status, last_count, pending_state, pending_state_time, last_status_update_time, last_screenshot_time
@@ -154,6 +190,8 @@ def run_detection():
     log_event(f"Confidence threshold: {args.threshold}")
     if args.discord:
         log_event("Discord notifications: ENABLED")
+    if args.display:
+        log_event("Live display: ENABLED (press 'q' to quit)")
     log_event("Press Ctrl+C to exit\n")
 
     # Initialize status file
@@ -206,6 +244,15 @@ def run_detection():
 
             log_event("Detection started. Monitoring for people...\n")
 
+            # Create window if display is enabled
+            if args.display:
+                cv2.namedWindow("Person Detection", cv2.WINDOW_NORMAL)
+                cv2.resizeWindow("Person Detection", 1024, 576)
+
+            # Track latest detections for display
+            latest_person_detections = []
+            latest_person_count = 0
+
             while pipeline.isRunning():
                 # Get detection results
                 detections_msg = q_det.tryGet()
@@ -221,7 +268,12 @@ def run_detection():
                                              if d.label == 0 and d.confidence >= args.threshold]
                         person_count = len(person_detections)
                     else:
+                        person_detections = []
                         person_count = 0
+
+                    # Update latest detections for display
+                    latest_person_detections = person_detections
+                    latest_person_count = person_count
 
                     person_detected = person_count > 0
                     current_time = time.time()
@@ -267,6 +319,31 @@ def run_detection():
                         log_event(f"   Count changed: {person_count} people")
                         last_count = person_count
 
+                # Display frame with detections if enabled (runs independently of detection messages)
+                if args.display and preview_frame is not None:
+                    frame = preview_frame.getCvFrame()
+
+                    # Draw latest detections
+                    if latest_person_detections:
+                        frame = draw_detections(frame, latest_person_detections,
+                                               frame.shape[1], frame.shape[0])
+
+                    # Add status text
+                    status_text = f"Detections: {latest_person_count} | Threshold: {args.threshold:.2f}"
+                    cv2.putText(frame, status_text, (10, 30),
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                    cv2.putText(frame, f"User: {username}@{hostname}", (10, 60),
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
+
+                    # Show frame
+                    cv2.imshow("Person Detection", frame)
+
+                    # Check for quit key
+                    key = cv2.waitKey(1) & 0xFF
+                    if key == ord('q'):
+                        log_event("Display window closed by user")
+                        break
+
                 # Periodic status file update (even when nothing changes)
                 current_time = time.time()
                 if current_time - last_status_update_time >= STATUS_UPDATE_INTERVAL:
@@ -281,6 +358,21 @@ def run_detection():
                     try:
                         # Get frame data as numpy array
                         frame = preview_frame.getCvFrame()
+
+                        # Draw detections on screenshot if available
+                        if detections_msg is not None and hasattr(detections_msg, 'detections'):
+                            all_dets = detections_msg.detections
+                            person_dets = [d for d in all_dets
+                                         if d.label == 0 and d.confidence >= args.threshold]
+                            if person_dets:
+                                frame = draw_detections(frame, person_dets,
+                                                       frame.shape[1], frame.shape[0])
+
+                            # Add status overlay
+                            status_text = f"Detections: {len(person_dets)} | User: {username}@{hostname}"
+                            cv2.putText(frame, status_text, (10, 30),
+                                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
                         # Save as JPEG
                         cv2.imwrite(str(SCREENSHOT_FILE), frame)
                         last_screenshot_time = current_time
@@ -299,6 +391,8 @@ def run_detection():
             send_discord_notification(discord_shutdown)
 
     finally:
+        if args.display:
+            cv2.destroyAllWindows()
         if log_file:
             log_file.close()
 
@@ -314,5 +408,23 @@ if __name__ == "__main__":
     if args.discord and not DOTENV_AVAILABLE:
         print("WARNING: python-dotenv not installed - ensure DISCORD_WEBHOOK_URL is in environment")
         print("   Install with: pip install python-dotenv")
+
+    # Check if display is requested and OpenCV has GUI support
+    if args.display:
+        try:
+            # Test if GUI functions are available
+            test_img = cv2.imread if hasattr(cv2, 'imread') else None
+            cv2.namedWindow("test", cv2.WINDOW_NORMAL)
+            cv2.destroyWindow("test")
+        except (cv2.error, AttributeError) as e:
+            print("ERROR: OpenCV GUI support not available")
+            print("   The --display flag requires OpenCV with GTK support")
+            print("   On Raspberry Pi, this requires building OpenCV from source")
+            print("")
+            print("Alternative: Run without --display and use Discord bot screenshots:")
+            print("   python3 person_detector_with_display.py")
+            print("   Then use Discord: !screenshot")
+            import sys
+            sys.exit(1)
 
     run_detection()

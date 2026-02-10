@@ -90,6 +90,8 @@ async def status(ctx):
         if STATUS_FILE.exists():
             status_data = json.loads(STATUS_FILE.read_text())
             timestamp = status_data.get('timestamp', 'unknown')
+            username = status_data.get('username', 'unknown')
+            hostname = status_data.get('hostname', 'unknown')
 
             # Check if status is recent (within last 10 seconds)
             try:
@@ -97,7 +99,8 @@ async def status(ctx):
                 age = (datetime.now() - status_time).total_seconds()
 
                 if age < 10:
-                    await ctx.send(f"✅ Camera is **ONLINE**\n📊 Last update: {age:.1f}s ago")
+                    user_info = f"👤 Running: **{username}** on **{hostname}**\n" if username != 'unknown' else ""
+                    await ctx.send(f"✅ Camera is **ONLINE**\n{user_info}📊 Last update: {age:.1f}s ago")
                 else:
                     await ctx.send(f"⚠️ Camera status is **STALE**\n📊 Last update: {age:.0f}s ago\nCamera may be offline.")
             except:
@@ -122,6 +125,8 @@ async def detect(ctx):
         detected = status_data.get('detected', False)
         count = status_data.get('count', 0)
         timestamp = status_data.get('timestamp', 'unknown')
+        username = status_data.get('username', 'unknown')
+        hostname = status_data.get('hostname', 'unknown')
 
         # Format response
         if detected:
@@ -131,7 +136,10 @@ async def detect(ctx):
             emoji = "⚪"
             status_text = "**No person detected**"
 
-        await ctx.send(f"{emoji} {status_text}\n🕐 Last update: {timestamp}")
+        # Add user info if available
+        user_info = f"👤 Camera: **{username}** on **{hostname}**\n" if username != 'unknown' else ""
+
+        await ctx.send(f"{emoji} {status_text}\n{user_info}🕐 Last update: {timestamp}")
 
     except Exception as e:
         await ctx.send(f"❌ Error reading detection data: {str(e)}")
