@@ -41,8 +41,7 @@ ssh smartobjects2.local        # 8GB Pi
 
 ```bash
 cd ~/oak-projects
-source /opt/oak-shared/venv/bin/activate
-# Or use the alias: activate-oak
+activate-oak
 ```
 
 Your prompt should change to show `(venv)`:
@@ -118,7 +117,7 @@ python3 person_detector.py --threshold 0.7
 | Problem | Solution |
 |---------|----------|
 | VS Code "No route to host" (Mac) | Grant Local Network permission: Settings → Privacy → Local Network → VS Code ✅ |
-| "No module named depthai" | Run `source /opt/oak-shared/venv/bin/activate` or `activate-oak` |
+| "No module named depthai" | Run `activate-oak` (alias for `source /opt/oak-shared/venv/bin/activate`) |
 | Camera not found | Check USB, try powered hub |
 | Permission denied | `sudo udevadm control --reload-rules && sudo udevadm trigger` |
 | VNC black screen | Set resolution in `raspi-config` → Display Options |

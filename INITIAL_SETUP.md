@@ -391,8 +391,7 @@ Connect your OAK-D camera via USB, then:
 
 ```bash
 # Activate shared virtual environment
-source /opt/oak-shared/venv/bin/activate
-# Or if you set up the alias: activate-oak
+activate-oak
 
 # Quick test - check if camera is detected
 python3 -c "import depthai as dai; devices = dai.Device.getAllAvailableDevices(); print(f'Found {len(devices)} camera(s)')"

@@ -544,8 +544,7 @@ lsusb | grep Myriad
 
 ### Import Errors
 If getting `ModuleNotFoundError: No module named 'depthai'` or `'depthai_nodes'`:
-- Ensure shared virtual environment is activated: `source /opt/oak-shared/venv/bin/activate`
-- Or use the alias: `activate-oak`
+- Ensure shared virtual environment is activated: `activate-oak` (alias for `source /opt/oak-shared/venv/bin/activate`)
 - Prompt should show `(venv)` prefix when activated
 - Verify installation: `pip list | grep depthai` should show both `depthai` and `depthai-nodes`
 

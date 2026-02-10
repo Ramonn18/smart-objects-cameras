@@ -77,7 +77,7 @@ SSH into your Raspberry Pi and install the Discord library:
 ssh smartobjects1.local
 
 # Activate venv
-source /opt/oak-shared/venv/bin/activate
+activate-oak
 
 # Install discord.py
 pip install discord.py
@@ -144,7 +144,7 @@ chmod +x discord_bot.py
 
 ```bash
 # Activate venv
-source /opt/oak-shared/venv/bin/activate
+activate-oak
 
 # Run the bot
 python3 discord_bot.py

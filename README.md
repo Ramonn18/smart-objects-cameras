@@ -150,8 +150,7 @@ You should see:
 **Before running any Python scripts**, activate the shared virtual environment:
 
 ```bash
-source /opt/oak-shared/venv/bin/activate
-# Or use the alias: activate-oak
+activate-oak
 ```
 
 Your prompt should change to show `(venv)`:
@@ -473,8 +472,7 @@ nano ~/.ssh/authorized_keys
 
 ```bash
 # Activate shared virtual environment
-source /opt/oak-shared/venv/bin/activate
-# Or: activate-oak
+activate-oak
 
 # Check camera connection (depthai 3.x)
 python3 -c "import depthai as dai; devices = dai.Device.getAllAvailableDevices(); print(f'Found {len(devices)} camera(s)')"
@@ -543,7 +541,7 @@ If you're experiencing camera issues or want the latest features, update the fir
 
 ```bash
 # Activate venv
-source /opt/oak-shared/venv/bin/activate
+activate-oak
 
 # Check current version
 python3 -c "import depthai as dai; device = dai.Device(); print(f'Bootloader: {device.getBootloaderVersion()}')"
@@ -600,7 +598,7 @@ sudo dphys-swapfile swapon
 journalctl -u person-detector -n 50
 
 # Test manually first
-source ~/oak-projects/venv/bin/activate
+activate-oak
 python3 ~/oak-projects/person_detector.py
 ```
 
@@ -734,8 +732,7 @@ Open a terminal inside VS Code:
 The terminal is already connected to the Pi! Activate the virtual environment:
 
 ```bash
-source /opt/oak-shared/venv/bin/activate
-# Or: activate-oak
+activate-oak
 ```
 
 Now you can run scripts:
@@ -900,7 +897,7 @@ Remote extensions install on the Pi, not your laptop. If an extension isn't work
 
 Make sure you:
 
-1. Activated the venv: `source ~/oak-projects/venv/bin/activate`
+1. Activated the venv: `activate-oak`
 2. Selected the correct interpreter in VS Code (bottom status bar)
 
 #### Slow Performance
@@ -1050,8 +1047,7 @@ Now we'll tell the camera where to send notifications.
 
 ```bash
 # Activate shared virtual environment
-source /opt/oak-shared/venv/bin/activate
-# Or: activate-oak
+activate-oak
 
 # Install required packages (if not already installed during initial setup)
 pip install requests aiohttp python-dotenv
@@ -1065,8 +1061,7 @@ Let's verify everything is working before integrating with the camera.
 
 ```bash
 # Activate shared virtual environment if not already
-source /opt/oak-shared/venv/bin/activate
-# Or: activate-oak
+activate-oak
 
 # Run test notification
 python3 discord_notifier.py
@@ -1098,8 +1093,7 @@ Now that the webhook is configured, run the person detector:
 
 ```bash
 # Activate shared virtual environment
-source /opt/oak-shared/venv/bin/activate
-# Or: activate-oak
+activate-oak
 
 # Run with Discord notifications
 python3 person_detector.py --discord
