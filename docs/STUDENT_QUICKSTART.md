@@ -5,7 +5,7 @@
 Follow these steps in order. Check them off as you complete them!
 
 - [ ] **Step 1:** Clone the GitHub repo to your laptop ([jump to section](#important-github-repo-location))
-- [ ] **Step 2:** Set up SSH access to your Pi ([jump to section](#getting-started))
+- [ ] **Step 2:** Set up SSH access to your Pi ([jump to section](#setting-up-ssh-access))
 - [ ] **Step 3:** Copy Python files from your laptop to the Pi ([jump to section](#step-1-copy-python-files-from-your-computer-to-the-pi))
 - [ ] **Step 4:** Check/create your `.env` file on the Pi ([jump to section](#step-2-create-your-environment-file-env))
 - [ ] **Step 5:** Run your first detector! ([jump to section](#running-fatigue-detection))
@@ -376,6 +376,22 @@ DISCORD_BOT_TOKEN=get_from_instructor_for_your_pi
 ---
 
 **⚠️ Important:** Never commit `.env` to GitHub! It contains secret tokens.
+
+---
+
+## Setting Up SSH Access
+
+**⚠️ On YOUR LOCAL COMPUTER**
+
+Before you can connect to the Pis, make sure your SSH config is set up. Test it:
+
+```bash
+ssh orbit
+```
+
+**If it works:** Skip to [Getting Started](#getting-started).
+
+**If you get "Host not found":** Your SSH config needs the Pi IP addresses (10.1.x.x). See the [main README - Part 1: Connecting to the Pis](../README.md#part-1-connecting-to-the-pis) for setup instructions, or ask your instructor for the IP addresses.
 
 ---
 
