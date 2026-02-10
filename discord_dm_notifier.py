@@ -32,10 +32,10 @@ from datetime import datetime
 import discord
 from discord.ext import commands, tasks
 
-# Load environment variables
+# Load environment variables from ~/oak-projects/.env (per-user)
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(Path.home() / "oak-projects" / ".env")
 except ImportError:
     pass
 

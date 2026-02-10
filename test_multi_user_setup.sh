@@ -87,7 +87,7 @@ SYMLINK_COUNT=0
 MISSING_COUNT=0
 for userdir in /home/*/; do
     username=$(basename "$userdir")
-    if [ -L "/home/$username/oak-examples" ]; then
+    if sudo test -L "/home/$username/oak-examples"; then
         ((SYMLINK_COUNT++))
     else
         warn "Missing symlink: /home/$username/oak-examples"

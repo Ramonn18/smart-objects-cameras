@@ -24,10 +24,10 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-# Load environment variables
+# Load environment variables from ~/oak-projects/.env (per-user)
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(Path.home() / "oak-projects" / ".env")
 except ImportError:
     print("⚠️  python-dotenv not installed - make sure DISCORD_BOT_TOKEN is in environment")
 

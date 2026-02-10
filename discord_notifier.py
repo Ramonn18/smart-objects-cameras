@@ -143,10 +143,11 @@ if __name__ == "__main__":
     # Run test when executed directly
     import sys
 
-    # Load environment variables from .env file if present
+    # Load environment variables from ~/oak-projects/.env (per-user)
     try:
+        from pathlib import Path
         from dotenv import load_dotenv
-        load_dotenv()
+        load_dotenv(Path.home() / "oak-projects" / ".env")
     except ImportError:
         print("⚠️  python-dotenv not installed - make sure DISCORD_WEBHOOK_URL is set in environment")
 

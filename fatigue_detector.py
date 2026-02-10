@@ -30,10 +30,10 @@ import numpy as np
 
 from utils.face_landmarks import determine_fatigue
 
-# Load environment variables for Discord
+# Load environment variables from ~/oak-projects/.env (per-user)
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(Path.home() / "oak-projects" / ".env")
     DOTENV_AVAILABLE = True
 except ImportError:
     DOTENV_AVAILABLE = False

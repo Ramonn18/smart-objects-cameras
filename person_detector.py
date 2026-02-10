@@ -24,10 +24,10 @@ import getpass
 from pathlib import Path
 from datetime import datetime
 
-# Load environment variables for Discord webhook
+# Load environment variables from ~/oak-projects/.env (per-user)
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(Path.home() / "oak-projects" / ".env")
     DOTENV_AVAILABLE = True
 except ImportError:
     DOTENV_AVAILABLE = False
