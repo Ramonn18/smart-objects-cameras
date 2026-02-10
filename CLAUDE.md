@@ -21,8 +21,11 @@ This is a **template repository** for creating Discord bots that communicate wit
 - Build interactive systems that bridge physical sensing and digital communication
 
 **Target Hardware:**
-- **Pi 5 #1 (16GB)**: Desktop environment with VNC access (hostname: `smartobjects1`)
-- **Pi 5 #2 (8GB)**: Headless environment for SSH/VS Code (hostname: `smartobjects2`)
+- **Orbit (16GB)**: Desktop environment with VNC access (hostname: `orbit`)
+- **Gravity (16GB)**: Desktop environment with VNC access (hostname: `gravity`)
+- **Horizon (16GB)**: Desktop environment with VNC access (hostname: `horizon`)
+
+**Note:** All three Raspberry Pis have VNC enabled, but only one user can hold the desktop seat at a time. Multiple users can SSH in simultaneously.
 
 **Students should feel encouraged to:**
 - Fork this template for their own projects
@@ -363,36 +366,57 @@ The Pis are configured with SSH key-based authentication for passwordless, secur
 
 **SSH Key Setup:**
 - Project-specific key name: `id_ed25519_smartobjects`
-- Same key works for both smartobjects1 and smartobjects2
-- SSH config should be configured for automatic key usage (see `INITIAL_SETUP.md` for setup details)
+- SSH config file configured with host aliases and IP addresses
+- See `INITIAL_SETUP.md` for setup details
+
+**Example SSH config (`~/.ssh/config`):**
+```
+Host orbit
+    HostName 192.168.x.x
+    User yourusername
+    IdentityFile ~/.ssh/id_ed25519_smartobjects
+
+Host gravity
+    HostName 192.168.x.x
+    User yourusername
+    IdentityFile ~/.ssh/id_ed25519_smartobjects
+
+Host horizon
+    HostName 192.168.x.x
+    User yourusername
+    IdentityFile ~/.ssh/id_ed25519_smartobjects
+```
 
 **To connect from your computer:**
 ```bash
 # SSH access (no password needed with keys configured)
-ssh smartobjects1.local       # 16GB desktop Pi
-ssh smartobjects2.local       # 8GB headless Pi
+ssh orbit       # Camera: Orbit
+ssh gravity     # Camera: Gravity
+ssh horizon     # Camera: Horizon
 ```
 
 **If you need to add your SSH key to the Pi:**
 ```bash
 # On your Mac/Linux laptop (if SSH config is set up)
-ssh-copy-id smartobjects1.local
+ssh-copy-id orbit
 
 # Or specify the key explicitly
-ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub smartobjects1.local
+ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
 
 # Or manually copy your public key
-cat ~/.ssh/id_ed25519_smartobjects.pub | ssh smartobjects1.local "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_ed25519_smartobjects.pub | ssh orbit "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
 
 **For Windows users without ssh-copy-id:**
 ```powershell
 # Copy your public key manually
-type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub | ssh smartobjects1.local "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub | ssh orbit "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
 
-### VNC Access (16GB Pi only)
-Connect via RealVNC Viewer to: `smartobjects1.local`
+### VNC Access
+All three Raspberry Pis have VNC enabled. Connect via RealVNC Viewer using the host name (e.g., `orbit`, `gravity`, or `horizon`).
+
+**Note:** Only one user can hold the VNC desktop seat at a time, but multiple users can SSH in simultaneously.
 
 ### WiFi Network Management
 The Pis can be moved between different WiFi networks (e.g., home to classroom).
@@ -451,8 +475,8 @@ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
 **Critical concept:** Each Pi has ONE camera. Only ONE person should run `person_detector.py` at a time.
 
 **Smart Object Feature:** The camera **automatically announces** who's using it when run with `--discord`:
-- **Startup:** `🎥 **alice** is now running person_detector.py on **smartobjects1**`
-- **Shutdown:** `📴 **alice** stopped person_detector.py on **smartobjects1** - camera is free`
+- **Startup:** `🎥 **alice** is now running person_detector.py on **orbit**`
+- **Shutdown:** `📴 **alice** stopped person_detector.py on **orbit** - camera is free`
 - **Status file includes:** Username and hostname (`camera_status.json`)
 
 **Collaboration Model:**
@@ -506,8 +530,8 @@ RuntimeError: filesystem error: cannot remove: Permission denied
 
 ```bash
 # Copy script to Pi and run with sudo
-scp setup_shared_model_cache.sh smartobjects1.local:~/
-ssh smartobjects1.local
+scp setup_shared_model_cache.sh orbit:~/
+ssh orbit
 chmod +x ~/setup_shared_model_cache.sh
 sudo ~/setup_shared_model_cache.sh
 ```
@@ -521,7 +545,7 @@ Recommended for code editing:
 1. Install "Remote - SSH" extension
 2. **macOS ONLY:** Grant VS Code "Local Network" permission in System Settings → Privacy & Security
 3. `Ctrl+Shift+P` → "Remote-SSH: Connect to Host"
-4. Enter: `smartobjects1.local` or `smartobjects2.local`
+4. Enter: `orbit`, `gravity`, or `horizon` (should auto-complete from your SSH config)
 5. Open folder: `/home/[username]/oak-projects`
 6. Select Python interpreter: `~/oak-projects/venv/bin/python` (or `/opt/oak-shared/venv/bin/python` for shared venv)
 
@@ -595,8 +619,8 @@ If getting `ModuleNotFoundError: No module named 'depthai'` or `'depthai_nodes'`
 ### Display Issues
 When using `--display` flag:
 - Requires X11 display server
-- Works on VNC Pi when connected via VNC
-- On headless Pi, requires X forwarding: `ssh -X smartobjects2.local`
+- Works when connected via VNC
+- For SSH-only access, requires X forwarding: `ssh -X orbit`
 - Press 'q' in OpenCV window to exit (in addition to Ctrl+C)
 
 ### Performance Problems

@@ -128,7 +128,7 @@ cp person_detector.py person_detector_alice.py
 ### When Ready to Share:
 ```bash
 # You pull their work manually
-scp smartobjects1.local:~/oak-projects/person_detector_alice.py ./students/
+scp orbit:~/oak-projects/person_detector_alice.py ./students/
 
 # Commit to their branch
 git checkout -b students/alice
@@ -235,7 +235,7 @@ git merge students/alice
 git push origin main
 
 # Deploy to Pi
-scp person_detector.py smartobjects1.local:~/oak-projects/
+scp person_detector.py orbit:~/oak-projects/
 ```
 
 ### For Students (Branch Model):

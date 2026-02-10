@@ -11,10 +11,13 @@ This is a **template project** for building Discord bots that communicate with L
 
 **Your instructor has pre-configured the Raspberry Pis** — you can connect and start experimenting immediately! This guide shows you how to use the template, then extend it for your own creative projects.
 
-| Device  | RAM  | Configuration | Hostname      | Access Method                |
-| ------- | ---- | ------------- | ------------- | ---------------------------- |
-| Pi 5 #1 | 16GB | Desktop + VNC | smartobjects1 | SSH (key-based) + VNC Viewer |
-| Pi 5 #2 | 8GB  | Headless      | smartobjects2 | SSH (key-based) / VS Code    |
+| Camera  | RAM  | Configuration | Hostname | Access Method                |
+| ------- | ---- | ------------- | -------- | ---------------------------- |
+| Orbit   | 16GB | Desktop + VNC | orbit    | SSH (key-based) + VNC Viewer |
+| Gravity | 16GB | Desktop + VNC | gravity  | SSH (key-based) + VNC Viewer |
+| Horizon | 16GB | Desktop + VNC | horizon  | SSH (key-based) + VNC Viewer |
+
+**Note:** All three Raspberry Pis have VNC enabled, but only one user can hold the VNC desktop seat at a time. Multiple users can SSH in simultaneously.
 
 **Note for instructors:** If you need to set up new Pis from scratch, see [INITIAL_SETUP.md](INITIAL_SETUP.md).
 
@@ -72,19 +75,18 @@ The Pis are already configured and ready to use! Here's how to connect.
 ### SSH Connection (Terminal Access)
 
 ```bash
-# For Desktop Pi (16GB)
-ssh smartobjects1.local
-
-# For Headless Pi (8GB)
-ssh smartobjects2.local
+# Connect to any of the three cameras
+ssh orbit
+ssh gravity
+ssh horizon
 ```
 
-**Your instructor has configured SSH key-based authentication**, so you should connect automatically without entering a password!
+**Your instructor has configured SSH key-based authentication** with SSH config files, so you should connect automatically without entering a password!
 
 **First time connecting?** You'll see a fingerprint verification prompt:
 
 ```
-The authenticity of host 'smartobjects1.local' can't be established.
+The authenticity of host 'orbit' can't be established.
 ED25519 key fingerprint is SHA256:...
 Are you sure you want to continue connecting (yes/no)?
 ```
@@ -93,19 +95,19 @@ Type `yes` and press Enter.
 
 **Troubleshooting:** If you get "Host not found" or connection fails:
 - Make sure the Pi is powered on and connected to the network
-- Try `ping smartobjects1.local` to check if it's reachable
-- Ask your instructor for the Pi's IP address and use that instead: `ssh smartobjects1` (replace with actual IP)
+- Check your SSH config file (`~/.ssh/config`) has the correct IP addresses
+- Ask your instructor for the Pi's IP address if needed
 
-### VNC Connection (Desktop Pi Only - Optional)
+### VNC Connection (Optional)
 
-For graphical desktop access to the 16GB Pi:
+For graphical desktop access to any of the Pis:
 
 1. Open **RealVNC Viewer** on your computer
-2. Enter: `smartobjects1.local` (or the IP address)
+2. Enter the hostname: `orbit`, `gravity`, or `horizon`
 3. Enter the username and password (ask your instructor)
 4. You should see the Pi desktop
 
-**Note:** VNC is only available on smartobjects1 (the desktop Pi). The headless Pi (smartobjects2) has no desktop environment.
+**Note:** All three Raspberry Pis have VNC enabled, but only one user can hold the VNC desktop seat at a time. Multiple users can SSH in simultaneously.
 
 ### VS Code Remote SSH (Recommended)
 
@@ -114,7 +116,7 @@ The best way to code on the Pi is using VS Code Remote-SSH extension. See **[App
 **Quick start:**
 1. Install VS Code and the "Remote - SSH" extension
 2. **macOS users:** Grant VS Code "Local Network" permission (System Settings → Privacy & Security → Local Network)
-3. Connect: `Ctrl+Shift+P` → "Remote-SSH: Connect to Host" → `smartobjects1.local`
+3. Connect: `Ctrl+Shift+P` → "Remote-SSH: Connect to Host" → `orbit` (or `gravity`, `horizon`)
 
 ---
 
@@ -155,7 +157,7 @@ activate-oak
 
 Your prompt should change to show `(venv)`:
 ```
-(venv) username@smartobjects1:~/oak-projects $
+(venv) username@orbit:~/oak-projects $
 ```
 
 ### Running the Person Detector
@@ -164,7 +166,7 @@ Your prompt should change to show `(venv)`:
 # Basic detection (console output only)
 python3 person_detector.py
 
-# With video display (VNC Pi only - requires desktop)
+# With video display (requires VNC or X11)
 python3 person_detector.py --display
 
 # With file logging
@@ -296,7 +298,7 @@ Modern Raspberry Pi OS uses **NetworkManager** for WiFi configuration. Here are 
 
 ```bash
 # SSH into the Pi
-ssh smartobjects1.local
+ssh orbit
 
 # Open NetworkManager Text UI
 sudo nmtui
@@ -401,12 +403,12 @@ Multiple students can access the same Pi simultaneously for collaborative work.
 
 ```bash
 # Student A runs the script:
-ssh smartobjects1.local
+ssh orbit
 source /opt/oak-shared/venv/bin/activate
 python3 person_detector.py --discord
 
 # Discord automatically shows:
-# 🎥 **alice** is now running person_detector.py on **smartobjects1**
+# 🎥 **alice** is now running person_detector.py on **orbit**
 
 # Other students can simultaneously:
 # - SSH in and view/edit code via VS Code Remote
@@ -416,7 +418,7 @@ python3 person_detector.py --discord
 
 # When Student A stops (Ctrl+C):
 # Discord automatically shows:
-# 📴 **alice** stopped person_detector.py on **smartobjects1** - camera is free
+# 📴 **alice** stopped person_detector.py on **orbit** - camera is free
 ```
 
 **No manual coordination needed!** The camera announces itself automatically.
@@ -457,7 +459,7 @@ If you want separate user accounts for each student:
 
 ```bash
 # SSH into the Pi
-ssh smartobjects1.local
+ssh orbit
 
 # Create new user
 sudo adduser alice
@@ -469,8 +471,8 @@ sudo usermod -aG video,gpio,i2c,spi alice
 sudo cp -r /home/pi/oak-projects /home/alice/
 sudo chown -R alice:alice /home/alice/oak-projects
 
-# The new user can now log in
-ssh alice@smartobjects1.local
+# The new user can now log in (update SSH config with new username)
+ssh orbit  # (after updating SSH config User field)
 ```
 
 ### Adding Multiple SSH Keys to Shared Account
@@ -479,15 +481,15 @@ If multiple people use the same Pi account:
 
 ```bash
 # Person 1 adds their key (if SSH config is set up)
-ssh-copy-id smartobjects1.local
-# Or: ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub smartobjects1.local
+ssh-copy-id orbit
+# Or: ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
 
 # Person 2 adds their key (doesn't overwrite Person 1's key)
-ssh-copy-id smartobjects1.local
-# Or: ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub smartobjects1.local
+ssh-copy-id orbit
+# Or: ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
 
 # Or manually add keys
-ssh smartobjects1.local
+ssh orbit
 nano ~/.ssh/authorized_keys
 # Paste each person's public key on a new line
 ```
@@ -507,10 +509,10 @@ RuntimeError: filesystem error: cannot remove: Permission denied
 
 ```bash
 # From instructor's computer
-scp setup_shared_model_cache.sh smartobjects1.local:~/
+scp setup_shared_model_cache.sh orbit:~/
 
 # SSH into the Pi and run
-ssh smartobjects1.local
+ssh orbit
 chmod +x ~/setup_shared_model_cache.sh
 sudo ~/setup_shared_model_cache.sh
 
@@ -551,12 +553,13 @@ tail -f ~/oak-projects/person_detection_*.log
 
 ### Network Access
 
-| Pi   | Hostname      | SSH Command               | VNC                   |
-| ---- | ------------- | ------------------------- | --------------------- |
-| 16GB | smartobjects1 | `ssh smartobjects1.local` | `smartobjects1.local` |
-| 8GB  | smartobjects2 | `ssh smartobjects2.local` | N/A                   |
+| Camera  | Hostname | SSH Command  | VNC     |
+| ------- | -------- | ------------ | ------- |
+| Orbit   | orbit    | `ssh orbit`  | `orbit` |
+| Gravity | gravity  | `ssh gravity`| `gravity` |
+| Horizon | horizon  | `ssh horizon`| `horizon` |
 
-**Note:** SSH uses key-based authentication (no password needed if configured).
+**Note:** SSH uses key-based authentication via SSH config (no password needed if configured). All three Pis have VNC, but only one user can hold the desktop seat at a time.
 
 ### File Locations
 
@@ -720,15 +723,12 @@ If you don't see Visual Studio Code:
 
 1. Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
 2. Type: `Remote-SSH: Connect to Host`
-3. Click **+ Add New SSH Host**
-4. Enter the connection string:
+3. If your SSH config is already set up, you should see `orbit`, `gravity`, and `horizon` in the list - just select one
+4. Otherwise, click **+ Add New SSH Host** and enter:
    ```
-   ssh smartobjects1.local
+   ssh orbit
    ```
-   Or for the headless Pi:
-   ```
-   ssh smartobjects2.local
-   ```
+   (or `gravity` or `horizon`)
 5. Select your SSH config file (usually the first option)
 6. Click **Connect** in the popup
 
@@ -743,8 +743,9 @@ On first connect:
 You'll know you're connected when the bottom-left corner shows:
 
 ```
->< SSH: smartobjects1.local
+>< SSH: orbit
 ```
+(or `gravity` or `horizon`, depending on which you connected to)
 
 ---
 
@@ -839,10 +840,10 @@ If you configured SSH keys during OS installation, VS Code will connect automati
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_smartobjects -C "your_email@example.com"
 
 # Copy to Pi (if SSH config is set up from Part 1)
-ssh-copy-id smartobjects1.local
+ssh-copy-id orbit
 
 # Or specify the key explicitly
-ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub smartobjects1.local
+ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub orbit
 ```
 
 **On Windows (PowerShell):**
@@ -852,7 +853,7 @@ ssh-copy-id -i ~/.ssh/id_ed25519_smartobjects.pub smartobjects1.local
 ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_ed25519_smartobjects -C "your_email@example.com"
 
 # Copy to Pi manually
-type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub | ssh smartobjects1.local "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub | ssh orbit "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
 
 Now VS Code will connect without asking for a password!
@@ -924,14 +925,8 @@ This is **required on macOS** - VS Code needs explicit permission to access loca
 
 1. Make sure the Pi is powered on and booted
 2. Check you're on the same network
-3. Try pinging: `ping smartobjects1.local`
-4. Try using IP address in SSH config instead of `.local` hostname:
-   ```
-   Host smartobjects1
-       HostName 192.168.1.xxx  # Use actual IP
-       User carrie
-       IdentityFile ~/.ssh/id_ed25519_smartobjects
-   ```
+3. Verify your SSH config has the correct IP address for the host
+4. Ask your instructor if the IP address has changed
 
 #### "Permission denied (publickey,password)"
 
@@ -948,7 +943,7 @@ Remote extensions install on the Pi, not your laptop. If an extension isn't work
 
 1. Open Extensions sidebar
 2. Look for the extension
-3. Check if it says "Install in SSH: smartobjects1"
+3. Check if it says "Install in SSH: orbit" (or gravity/horizon)
 4. Click to install it on the remote
 
 #### Terminal Shows Wrong Python
@@ -1067,9 +1062,11 @@ Now we'll tell the camera where to send notifications.
 1. **SSH into your Pi**
 
    ```bash
-   ssh smartobjects1.local
+   ssh orbit
    # or
-   ssh smartobjects2.local
+   ssh gravity
+   # or
+   ssh horizon
    ```
 
 2. **Navigate to the project directory**

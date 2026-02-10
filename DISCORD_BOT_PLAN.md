@@ -74,7 +74,7 @@ SSH into your Raspberry Pi and install the Discord library:
 
 ```bash
 # SSH into Pi
-ssh smartobjects1.local
+ssh orbit  # or gravity, or horizon
 
 # Activate venv
 activate-oak

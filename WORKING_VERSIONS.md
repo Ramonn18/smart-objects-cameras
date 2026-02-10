@@ -158,7 +158,7 @@ sudo /opt/oak-shared/venv/bin/pip install <package>
 ## Hardware Configuration
 
 ### Raspberry Pi 5 Specifications
-- **Model:** Raspberry Pi 5 (16GB RAM recommended, 8GB minimum)
+- **Model:** Raspberry Pi 5 (16GB RAM)
 - **OS:** Raspberry Pi OS (Bookworm) 64-bit
 - **USB:** Use USB 3.0 (blue) ports for OAK-D camera
 - **Power:** 27W official adapter or powered USB hub recommended

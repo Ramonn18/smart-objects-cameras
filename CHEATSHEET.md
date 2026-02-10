@@ -2,12 +2,15 @@
 
 ## 🔌 Network Info
 
-| Pi | Hostname | IP Lookup | Access |
-|----|----------|-----------|--------|
-| 16GB | `smartobjects1` | `ping smartobjects1.local` | SSH (key-based) + VNC |
-| 8GB | `smartobjects2` | `ping smartobjects2.local` | SSH (key-based) only |
+| Camera  | Hostname  | SSH Command    | Access             |
+|---------|-----------|----------------|--------------------|
+| Orbit   | `orbit`   | `ssh orbit`    | SSH (key-based) + VNC |
+| Gravity | `gravity` | `ssh gravity`  | SSH (key-based) + VNC |
+| Horizon | `horizon` | `ssh horizon`  | SSH (key-based) + VNC |
 
-**Authentication:** SSH key-based (no password needed if configured)
+**Authentication:** SSH key-based via SSH config (no password needed if configured)
+
+**Note:** All three Pis have VNC, but only one user can hold the VNC desktop seat at a time.
 
 ---
 
@@ -15,22 +18,25 @@
 
 ### SSH (Terminal Access)
 ```bash
-ssh smartobjects1.local        # 16GB Pi
-ssh smartobjects2.local        # 8GB Pi
+ssh orbit          # Camera: Orbit
+ssh gravity        # Camera: Gravity
+ssh horizon        # Camera: Horizon
 ```
 
-**Note:** No password needed with SSH keys configured!
+**Note:** No password needed with SSH keys configured via SSH config!
 
-### VNC (Desktop Access — 16GB Pi only)
+### VNC (Desktop Access)
 1. Open RealVNC Viewer
-2. Connect to: `smartobjects1.local`
+2. Connect to: `orbit`, `gravity`, or `horizon`
 3. Login with your username and password
+
+**Note:** All three Pis have VNC, but only one user can hold the desktop seat at a time.
 
 ### VS Code Remote (Recommended for coding)
 1. **Mac users:** Grant VS Code "Local Network" permission first!
    - System Settings → Privacy & Security → Local Network → VS Code ✅
 2. `Ctrl+Shift+P` → "Remote-SSH: Connect to Host"
-3. Enter: `smartobjects1.local` or `smartobjects2.local`
+3. Select: `orbit`, `gravity`, or `horizon`
 4. Open folder: `/home/[username]/oak-projects`
 
 ---
@@ -46,7 +52,7 @@ activate-oak
 
 Your prompt should change to show `(venv)`:
 ```
-(venv) carrie@smartobjects1:~/oak-projects $
+(venv) carrie@orbit:~/oak-projects $
 ```
 
 ---
@@ -215,8 +221,8 @@ sudo raspi-config
 
 ### Add Your SSH Key
 ```bash
-# From your laptop
-ssh-copy-id smartobjects1.local
+# From your laptop (after setting up SSH config)
+ssh-copy-id orbit
 ```
 
 ### Multiple People, Same Pi

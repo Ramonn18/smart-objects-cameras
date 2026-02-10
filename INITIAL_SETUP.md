@@ -8,12 +8,15 @@ This guide covers the initial setup process for configuring the Raspberry Pi 5 s
 
 ## Overview
 
-This document walks through setting up two Raspberry Pi 5 configurations:
+This document walks through setting up three Raspberry Pi 5 configurations:
 
-| Device  | RAM  | Configuration | Hostname      | Access Method                |
-| ------- | ---- | ------------- | ------------- | ---------------------------- |
-| Pi 5 #1 | 16GB | Desktop + VNC | smartobjects1 | SSH (key-based) + VNC Viewer |
-| Pi 5 #2 | 8GB  | Headless      | smartobjects2 | SSH (key-based) / VS Code    |
+| Camera  | RAM  | Configuration | Hostname | Access Method                |
+| ------- | ---- | ------------- | -------- | ---------------------------- |
+| Orbit   | 16GB | Desktop + VNC | orbit    | SSH (key-based) + VNC Viewer |
+| Gravity | 16GB | Desktop + VNC | gravity  | SSH (key-based) + VNC Viewer |
+| Horizon | 16GB | Desktop + VNC | horizon  | SSH (key-based) + VNC Viewer |
+
+**Note:** All three Pis use the same configuration. Only one user can hold the VNC desktop seat at a time on each Pi, but multiple users can SSH in simultaneously.
 
 ---
 
@@ -21,7 +24,7 @@ This document walks through setting up two Raspberry Pi 5 configurations:
 
 ### Hardware
 
-- Raspberry Pi 5 (8GB or 16GB)
+- Raspberry Pi 5 (16GB)
 - MicroSD card (32GB+ recommended)
 - USB-C power supply (27W official Pi 5 supply recommended)
 - OAK-D camera (USB)
@@ -43,7 +46,7 @@ This document walks through setting up two Raspberry Pi 5 configurations:
 **Before imaging**, you'll need an SSH key pair on your computer for passwordless authentication.
 
 **Important Notes:**
-- ✅ **You can use the SAME key for BOTH Raspberry Pis** (smartobjects1 and smartobjects2)
+- ✅ **You can use the SAME key for ALL THREE Raspberry Pis** (Orbit, Gravity, and Horizon)
 - ✅ We'll use a project-specific key name to avoid conflicts with existing keys
 
 **On Mac/Linux:**
@@ -77,11 +80,13 @@ type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub
 **What is this key doing?**
 - **Private key** (`id_ed25519_smartobjects`) - Stays on YOUR computer (never share!)
 - **Public key** (`id_ed25519_smartobjects.pub`) - Goes on the Pis (safe to share)
-- Same key pair works for both smartobjects1 and smartobjects2
+- Same key pair works for all three Pis (Orbit, Gravity, Horizon)
 
 ---
 
-### For the 16GB Pi (Desktop + VNC)
+### For Each Pi (All use Desktop + VNC)
+
+Repeat this process for each Pi (Orbit, Gravity, Horizon):
 
 1. Open Raspberry Pi Imager
 2. Click **Choose Device** → Raspberry Pi 5
@@ -92,7 +97,7 @@ type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub
 #### General Tab:
 
 ```
-☑ Set hostname: smartobjects1
+☑ Set hostname: orbit  (or gravity, or horizon)
 ☑ Set username and password
     Username: [your username, e.g., carrie]
     Password: [choose a password - optional if using SSH keys]
@@ -111,32 +116,21 @@ type $env:USERPROFILE\.ssh\id_ed25519_smartobjects.pub
 
 ```
 ☑ Enable SSH
-  ● Allow public-key authentication only (RECOMMENDED for headless Pi)
+  ● Allow public-key authentication only (RECOMMENDED)
 
   Paste your SSH public key (from preparation step above):
   [Paste the entire ssh-ed25519 ... key here]
 ```
 
-**For the desktop Pi (smartobjects1)**, you can use either:
+For all three Pis, you can use either:
 - **Public-key authentication only** (more secure)
 - **Use password authentication** (easier for beginners with VNC access)
 
 6. Click **Save**, then **Yes** to apply settings
 7. Click **Yes** to confirm and write the image
+8. **Repeat for the other two Pis** with hostnames `gravity` and `horizon`
 
----
-
-### For the 8GB Pi (Headless)
-
-**IMPORTANT:** For the headless Pi, you **MUST** use SSH key authentication since there's no display/VNC to fall back on.
-
-Repeat the above steps with these changes:
-
-- **Choose OS** → Raspberry Pi OS Lite (64-bit) _(no desktop)_
-- **Set hostname:** `smartobjects2`
-- **Services Tab:** Select **"Allow public-key authentication only"** and paste **the SAME public key** you used for smartobjects1
-
-**💡 Pro tip:** You're using the same key for both Pis - this means one key unlocks both systems!
+**💡 Pro tip:** You're using the same SSH key for all three Pis - one key unlocks all three systems!
 
 ---
 
@@ -150,13 +144,18 @@ Since we used a custom key name (`id_ed25519_smartobjects`), we need to tell SSH
 nano ~/.ssh/config
 
 # Add these entries:
-Host smartobjects1 smartobjects1.local
-    HostName smartobjects1.local
+Host orbit
+    HostName 192.168.x.x  # Replace with actual IP
     User [your-username]
     IdentityFile ~/.ssh/id_ed25519_smartobjects
 
-Host smartobjects2 smartobjects2.local
-    HostName smartobjects2.local
+Host gravity
+    HostName 192.168.x.x  # Replace with actual IP
+    User [your-username]
+    IdentityFile ~/.ssh/id_ed25519_smartobjects
+
+Host horizon
+    HostName 192.168.x.x  # Replace with actual IP
     User [your-username]
     IdentityFile ~/.ssh/id_ed25519_smartobjects
 
@@ -177,8 +176,9 @@ notepad $env:USERPROFILE\.ssh\config
 
 **Now you can simply connect with:**
 ```bash
-ssh smartobjects1.local  # No need to specify key!
-ssh smartobjects2.local
+ssh orbit    # No need to specify key!
+ssh gravity
+ssh horizon
 ```
 
 ---
@@ -189,17 +189,17 @@ ssh smartobjects2.local
 2. Connect Ethernet (recommended) or ensure WiFi credentials are correct
 3. Connect power — wait 2-3 minutes for first boot
 4. Find your Pi's IP address:
-   - Check your router's admin page, or
-   - Use `ping smartobjects1.local` (or `smartobjects2.local`)
+   - Check your router's admin page for devices named orbit, gravity, or horizon
+   - Try `ping orbit.local` (or `gravity.local`, `horizon.local`) if mDNS is working
+   - Update your SSH config with the actual IP addresses
 
 ### First SSH Connection
 
 ```bash
-# For Desktop Pi (16GB)
-ssh smartobjects1.local
-
-# For Headless Pi (8GB)
-ssh smartobjects2.local
+# Connect to any of the three Pis
+ssh orbit
+ssh gravity
+ssh horizon
 ```
 
 **If you configured SSH keys:** You'll connect automatically without entering a password!
@@ -208,7 +208,7 @@ ssh smartobjects2.local
 
 On first connection, you'll see a fingerprint verification prompt:
 ```
-The authenticity of host 'smartobjects1.local' can't be established.
+The authenticity of host 'orbit' can't be established.
 ED25519 key fingerprint is SHA256:...
 Are you sure you want to continue connecting (yes/no)?
 ```
@@ -216,9 +216,9 @@ Type `yes` and press Enter.
 
 ---
 
-## Part 3: System Updates (Both Pis)
+## Part 3: System Updates (All Three Pis)
 
-Run these commands on both Pis:
+Run these commands on all three Pis:
 
 ```bash
 # Update package lists and upgrade
@@ -239,12 +239,12 @@ sudo reboot
 
 ---
 
-## Part 4: VNC Setup (16GB Pi Only)
+## Part 4: VNC Setup (All Three Pis)
 
-After reboot, SSH back into the desktop Pi:
+After reboot, SSH back into any Pi:
 
 ```bash
-ssh smartobjects1.local
+ssh orbit  # or gravity, or horizon
 ```
 
 ### Enable VNC
@@ -262,9 +262,11 @@ Navigate to:
 ### Connect via VNC
 
 1. Open RealVNC Viewer on your computer
-2. Enter: `smartobjects1.local` (or the IP address)
+2. Enter: `orbit` (or `gravity`, `horizon`) - or use the IP address
 3. Enter your username and password
 4. You should see the Pi desktop
+
+**Note:** Only one user can hold the VNC desktop seat at a time on each Pi.
 
 ### Optional: Performance Tweaks for VNC
 
@@ -280,7 +282,7 @@ sudo raspi-config
 
 ---
 
-## Part 5: DepthAI Installation (Both Pis)
+## Part 5: DepthAI Installation (All Three Pis)
 
 ### Understanding User Accounts
 
