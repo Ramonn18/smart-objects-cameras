@@ -1,8 +1,29 @@
+# Environment variables (contain secrets)
 .env
 *.env
+
+# Generated status files (runtime state)
 camera_status.json
+fatigue_status.json
+whiteboard_status.json
+
+# Generated screenshots (runtime artifacts)
 latest_frame.jpg
+latest_fatigue_frame.jpg
+latest_whiteboard_frame.jpg
+
+# Log files
 *.log
+
+# Python cache
 __pycache__/
 *.pyc
+
+# OS files
 .DS_Store
+
+# Downloaded model cache (large model files)
+# Note: depthai_models/*.yaml are kept in git (tiny config files)
+.depthai/
+*.blob
+*.bin
