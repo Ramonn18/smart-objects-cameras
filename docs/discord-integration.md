@@ -20,7 +20,7 @@ This guide covers setting up Discord integration for real-time person detection 
 - Bot runs on the Raspberry Pi
 - **Best for:** Interactive monitoring and control
 
-**This guide covers webhooks. For bot setup, see [DISCORD_BOT_PLAN.md](../DISCORD_BOT_PLAN.md).**
+**This guide covers webhooks. For bot setup, see [DISCORD_BOT_PLAN.md](DISCORD_BOT_PLAN.md).**
 
 ---
 
@@ -411,7 +411,7 @@ send_notification("Person detected", username="Camera 2 - Backyard")
 
 For two-way interaction with commands like `!status`, `!screenshot`, and `!detect`, see the complete bot setup guide:
 
-**[DISCORD_BOT_PLAN.md](../DISCORD_BOT_PLAN.md)** - Step-by-step Discord bot configuration (30-45 minutes)
+**[DISCORD_BOT_PLAN.md](DISCORD_BOT_PLAN.md)** - Step-by-step Discord bot configuration (30-45 minutes)
 
 ---
 
@@ -467,5 +467,5 @@ This makes experimentation fast and collaborative - you're having a dialog with 
 ## Related Documentation
 
 - [README.md](../README.md) - Main documentation
-- [DISCORD_BOT_PLAN.md](../DISCORD_BOT_PLAN.md) - Complete bot setup guide
-- [Multi-User Access](multi-user-access.md) - Collaborative workflows
+- [DISCORD_BOT_PLAN.md](DISCORD_BOT_PLAN.md) - Complete bot setup guide
+- [Multi-User Access](archive/multi-user-access.md) - Collaborative workflows
