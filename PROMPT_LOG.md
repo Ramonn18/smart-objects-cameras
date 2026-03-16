@@ -21,3 +21,10 @@ A running log of prompts and responses for this project.
 **Response:** Understood. From now on, every prompt and response will be automatically appended to this log file.
 
 ---
+
+### Prompt 3
+**User:** Create a sub folder in this folder title E-Wall_Brain_Storm
+
+**Response:** Created the subfolder `E-Wall_Brain_Storm` inside the project root.
+
+---
