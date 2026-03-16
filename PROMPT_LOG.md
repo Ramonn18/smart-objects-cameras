@@ -28,3 +28,10 @@ A running log of prompts and responses for this project.
 **Response:** Created the subfolder `E-Wall_Brain_Storm` inside the project root.
 
 ---
+
+### Prompt 4
+**User:** Base on the E-Wall_Brain_Storm folder file. Lets create an Initial .py file for the project
+
+**Response:** Read the brainstorm image (`Smart Classroom - ixD 27'.png`) to understand the E-Wall (E-CA) concept — an ultra-short-throw projector + OAK-D camera system that tracks presenter gestures on stage to drive dynamic visual projections. Created `E-Wall_Brain_Storm/e_wall.py` with: YOLO person detection via DepthAI 3.x pipeline, stage zone calibration, gesture classification (center_stage, left_wing, right_wing, close_to_wall, back_of_stage), debouncing, Discord notifications, live display with zone overlay, and status file output.
+
+---
