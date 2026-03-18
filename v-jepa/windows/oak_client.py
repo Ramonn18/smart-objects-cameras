@@ -106,7 +106,7 @@ def open_device(ip: str | None) -> dai.Device:
         return dai.Device()
 
 
-def capture_clip(queue: dai.DataOutputQueue, num_frames: int) -> str:
+def capture_clip(queue, num_frames: int) -> str:
     """
     Capture num_frames from the OAK-D preview queue.
     Writes to a temp .mp4 and returns the path.

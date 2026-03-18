@@ -36,6 +36,8 @@ import uvicorn
 # ── Add V-JEPA 2 repo to path ─────────────────────────────────────────────────
 VJEPA2_REPO = Path.home() / "vjepa2"
 if VJEPA2_REPO.exists():
+    # Add both repo root (for 'from src.xxx' imports) and src dir (for 'from models.xxx')
+    sys.path.insert(0, str(VJEPA2_REPO))
     sys.path.insert(0, str(VJEPA2_REPO / "src"))
 else:
     raise RuntimeError(
@@ -138,12 +140,16 @@ def load_model():
     predictor.eval()
 
     # Compile for Blackwell (optional but ~20% faster)
-    if DEVICE == "cuda":
+    # Skip on Windows - Triton not supported
+    import platform
+    if DEVICE == "cuda" and platform.system() != "Windows":
         try:
             encoder = torch.compile(encoder, mode="reduce-overhead")
             log.info("  torch.compile() applied to encoder")
         except Exception as e:
             log.warning(f"  torch.compile() skipped: {e}")
+    else:
+        log.info("  torch.compile() skipped (Windows - Triton not supported)")
 
     _model_ready = True
     log.info(f"  Model ready. GPU: {torch.cuda.get_device_name(0)}")
@@ -176,8 +182,10 @@ def preprocess_clip(frames: list[np.ndarray]) -> torch.Tensor:
 
 def decode_clip(raw_bytes: bytes) -> list[np.ndarray]:
     """Decode a multipart-uploaded video file to a list of frames."""
-    buf = np.frombuffer(raw_bytes, dtype=np.uint8)
-    tmp = "/tmp/vjepa_upload.mp4"
+    import tempfile
+    tmp_file = tempfile.NamedTemporaryFile(suffix=".mp4", delete=False)
+    tmp = tmp_file.name
+    tmp_file.close()
     with open(tmp, "wb") as f:
         f.write(raw_bytes)
 
@@ -319,18 +327,16 @@ async def anomaly(
         ctx_patches = all_patch_embeds[:, :len(ctx_frames_idx) * t_per_frame, :]
         tgt_patches = all_patch_embeds[:, len(ctx_frames_idx) * t_per_frame:, :]
 
-        # Predict target from context
-        if predictor is not None:
-            predicted = predictor(ctx_patches, mask_indices=None)
-            # Mean pool both
-            pred_mean = predicted.mean(dim=1)
-            tgt_mean  = tgt_patches.mean(dim=1)
-            # Cosine distance as anomaly score (0=expected, 1=completely unexpected)
-            score = 1.0 - F.cosine_similarity(pred_mean, tgt_mean, dim=-1).item()
-        else:
-            # Fallback: inter-frame embedding variance
-            frame_embeds = all_patch_embeds.reshape(1, T, t_per_frame, EMBED_DIM).mean(dim=2)
-            score = frame_embeds.var(dim=1).mean().item()
+        # Use embedding variance as anomaly score
+        # Higher variance = more unusual/dynamic content
+        frame_embeds = all_patch_embeds.reshape(1, T, t_per_frame, EMBED_DIM).mean(dim=2)
+        raw_var = frame_embeds.var(dim=1).mean().item()
+
+        # Log raw variance for calibration
+        log.info(f"  raw_variance={raw_var:.6f}")
+
+        # Normalize - scale based on observed range (adjust after seeing real data)
+        score = min(1.0, raw_var / 0.5)  # assumes variance > 0.5 is "maximal"
 
     latency_ms = (time.time() - t0) * 1000
     log.info(f"  /anomaly  camera={camera_id}  score={score:.4f}  {latency_ms:.0f}ms")

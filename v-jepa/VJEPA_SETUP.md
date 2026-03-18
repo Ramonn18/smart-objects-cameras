@@ -288,3 +288,73 @@ Run for 15+ minutes of normal activity before relying on scores.
 **Connection refused from Pi**
 Check PC firewall. On Linux: `sudo ufw allow 8765`.
 On Windows: Windows Defender Firewall → Inbound Rules → New Rule → Port 8765.
+
+---
+
+## Windows-Specific Notes (Tested 2026-03-17)
+
+### Setup for Windows
+
+Use `v-jepa/windows/setup.bat` in Anaconda Prompt:
+```powershell
+cd v-jepa\windows
+setup.bat
+```
+
+### Known Issues and Fixes Applied
+
+**1. torch.compile() / Triton not supported on Windows**
+- `server.py` automatically skips `torch.compile()` on Windows
+- Inference is ~20% slower but works fine
+- ~300ms per clip on RTX 5070 Ti
+
+**2. Temp file path (Linux vs Windows)**
+- Fixed `/tmp/vjepa_upload.mp4` → uses `tempfile.NamedTemporaryFile()`
+
+**3. OpenCV GUI support**
+- If you get "function not implemented" errors with `--display`:
+  ```powershell
+  pip uninstall opencv-python opencv-python-headless -y
+  pip install opencv-python
+  ```
+
+**4. Type hints for older depthai**
+- Removed `dai.DataOutputQueue` type hint that caused AttributeError
+
+### Running on Windows (2 OAK-D cameras)
+
+**Terminal 1 - Server:**
+```powershell
+conda activate vjepa
+cd v-jepa
+python server.py
+```
+
+**Terminal 2 - USB camera:**
+```powershell
+conda activate vjepa
+cd v-jepa\windows
+python oak_client.py --name usb-oak --display
+```
+
+**Terminal 3 - Ethernet camera:**
+```powershell
+conda activate vjepa
+cd v-jepa\windows
+python oak_client.py --ip 192.168.X.X --name eth-oak --display
+```
+
+### Current Anomaly Scoring (Simplified)
+
+The current implementation uses **embedding variance** instead of true JEPA prediction:
+- Measures how much V-JEPA embeddings change across frames in a clip
+- Higher variance = more motion/change in scene
+- Baseline for static scene: ~0.10-0.12 raw variance, ~0.20 score
+
+**Observed behavior (2026-03-17 testing):**
+- Scores remain fairly stable (~0.19-0.22) regardless of scene content
+- Not sensitive enough to detect "anomalies" like person entering/leaving
+- Better suited for the **probe training approach** (Part 5) than raw anomaly detection
+
+**TODO:** Implement proper JEPA prediction-error scoring using the predictor model
+(requires understanding the V-JEPA 2 predictor API)
