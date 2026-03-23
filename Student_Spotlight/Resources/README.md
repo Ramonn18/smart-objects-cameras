@@ -71,7 +71,7 @@ The class has had a participation problems, this project is trying to increase s
 - **Camera:** Luxonis OAK-D (connected to Raspberry Pi)
 - **Raspberry Pi:** orbit / gravity / horizon
 - **Audio output:** Pi's 3.5mm audio jack or HDMI audio → speaker or monitor for chime playback
-- **Display / Projection:** Not required for this scope (future consideration)
+- **Display / Projection:** Not required for this scope (future consideration maybe for projected queue in wall)
 
 ---
 
@@ -98,8 +98,13 @@ The class has had a participation problems, this project is trying to increase s
 
 <!-- Links, images, prior art, or examples that inspired this project. -->
 
--
+---When students don’t want to think for themselves or put in effort, try this.
+https://truthforteachers.com/truth-for-teachers-podcast/when-students-dont-want-to-think-for-themselves-or-put-in-effort-try-this/
 
----
+---“Student Spotlight” Activity: Cultivating an Empathetic Online Community
+http://edtechbooks.org/designing_engaging_interactive_synchronous_online_classes/student_spotlight
+
+---About One-Quarter of Public Schools Reported That Lack of Focus or Inattention From Students Had a Severe Negative Impact on Learning in 2023-24
+https://ies.ed.gov/learn/press-release/about-one-quarter-public-schools-reported-lack-focus-or-inattention-students-had-severe-negative
 
 *Last updated: 2026-03-23 — scope narrowed to sound cue + Discord DM outputs*
