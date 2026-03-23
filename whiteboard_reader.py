@@ -212,6 +212,26 @@ def draw_text_boxes(frame, detections):
     return frame
 
 
+def draw_info_banner(frame, info_items):
+    """Draw a semi-transparent info banner at the bottom of the frame.
+
+    Args:
+        frame: OpenCV BGR image (numpy array)
+        info_items: list of strings to display, pipe-separated
+    Returns:
+        frame with banner drawn
+    """
+    h, w = frame.shape[:2]
+    banner_h = 40
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (0, h - banner_h), (w, h), (0, 0, 0), -1)
+    cv2.addWeighted(overlay, 0.6, frame, 0.4, 0, frame)
+    text = " | ".join(info_items)
+    cv2.putText(frame, text, (10, h - banner_h // 2 + 5),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    return frame
+
+
 def run_detection():
     """Main OCR detection loop using DepthAI 3.x."""
     global log_file, last_text_content, last_text_detected
@@ -449,10 +469,13 @@ def run_detection():
 
                                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-                            # Add overlay
-                            status_text = f"Regions: {len(det_msg.detections)} | {username}@{hostname}"
-                            cv2.putText(frame, status_text, (10, 30),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                        # Add info banner
+                        info_items = [
+                            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            f"{len(det_msg.detections) if det_msg is not None and hasattr(det_msg, 'detections') else 0} regions",
+                            f"{username}@{hostname}",
+                        ]
+                        frame = draw_info_banner(frame, info_items)
 
                         cv2.imwrite(str(SCREENSHOT_FILE), frame)
                         last_screenshot_time = current_time

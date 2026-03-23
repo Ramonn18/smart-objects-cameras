@@ -718,6 +718,26 @@ def draw_text_on_frame(frame, detections_list, recognitions_list, min_confidence
     return frame
 
 
+def draw_info_banner(frame, info_items):
+    """Draw a semi-transparent info banner at the bottom of the frame.
+
+    Args:
+        frame: OpenCV BGR image (numpy array)
+        info_items: list of strings to display, pipe-separated
+    Returns:
+        frame with banner drawn
+    """
+    h, w = frame.shape[:2]
+    banner_h = 40
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (0, h - banner_h), (w, h), (0, 0, 0), -1)
+    cv2.addWeighted(overlay, 0.6, frame, 0.4, 0, frame)
+    text = " | ".join(info_items)
+    cv2.putText(frame, text, (10, h - banner_h // 2 + 5),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    return frame
+
+
 def run_detection():
     """Main OCR detection loop using DepthAI 3.x with full text recognition."""
     global log_file, last_text_content, last_text_detected
@@ -885,6 +905,13 @@ def run_detection():
                 cv2.namedWindow("Whiteboard OCR - Full", cv2.WINDOW_NORMAL)
                 cv2.resizeWindow("Whiteboard OCR - Full", 1152, 640)
 
+            # Cache latest OCR results for screenshot annotation
+            # (preview frames and gathered messages arrive at different rates)
+            latest_gathered = None
+            num_regions = 0
+            text_lines = []
+            avg_confidence = 0.0
+
             while pipeline.isRunning():
                 # Get synced detection + recognition results
                 gathered_msg = q_gathered.tryGet()
@@ -893,6 +920,7 @@ def run_detection():
                 preview_frame = q_preview.tryGet()
 
                 if gathered_msg is not None:
+                    latest_gathered = gathered_msg
                     # Extract detections and recognitions
                     detections_msg = gathered_msg.reference_data
                     recognitions_list = gathered_msg.gathered
@@ -1061,21 +1089,30 @@ def run_detection():
                                      running=True, username=username, hostname=hostname)
                     last_status_update_time = current_time
 
-                # Periodic screenshot save
-                if preview_frame is not None and gathered_msg is not None and current_time - last_screenshot_time >= SCREENSHOT_UPDATE_INTERVAL:
+                # Periodic screenshot save (uses cached OCR results so it doesn't
+                # depend on gathered_msg arriving in the same loop iteration)
+                if preview_frame is not None and current_time - last_screenshot_time >= SCREENSHOT_UPDATE_INTERVAL:
                     try:
                         frame = preview_frame.getCvFrame()
 
-                        # Draw text on screenshot
-                        detections_list = gathered_msg.reference_data.detections if hasattr(gathered_msg.reference_data, 'detections') else []
-                        recognitions_list = gathered_msg.gathered
+                        # Draw text on screenshot using cached OCR results
+                        if latest_gathered is not None:
+                            detections_list = latest_gathered.reference_data.detections if hasattr(latest_gathered.reference_data, 'detections') else []
+                            recognitions_list_cached = latest_gathered.gathered
+                            frame = draw_text_on_frame(frame, detections_list, recognitions_list_cached, args.confidence)
 
-                        frame = draw_text_on_frame(frame, detections_list, recognitions_list, args.confidence)
-
-                        # Add overlay
-                        status_text = f"Lines: {len(text_lines) if gathered_msg else 0} | {username}@{hostname}"
-                        cv2.putText(frame, status_text, (10, 30),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                        # Add info banner
+                        _num_regions = num_regions or 0
+                        _text_lines = text_lines or []
+                        _avg_confidence = avg_confidence or 0.0
+                        info_items = [
+                            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            f"{_num_regions} regions, {len(_text_lines)} lines",
+                        ]
+                        if _avg_confidence > 0:
+                            info_items.append(f"Conf: {_avg_confidence:.0%}")
+                        info_items.append(f"{username}@{hostname}")
+                        frame = draw_info_banner(frame, info_items)
 
                         cv2.imwrite(str(SCREENSHOT_FILE), frame)
                         last_screenshot_time = current_time
