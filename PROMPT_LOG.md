@@ -106,3 +106,10 @@ A running log of prompts and responses for this project.
 **Response:** Noted — logging this and all future prompts/responses going forward without being reminded.
 
 ---
+
+### Prompt 4
+**User:** lets build upon 2 of the suggestions: Sound cue and Student's own screen (Discord DM)
+
+**Response:** Updated Student_Spotlight/Resources/README.md — filled in Scope (in/out), Users/Audience, Key Features table, Hardware, Technical Approach, and Open Questions based on the two chosen output methods. Key open question raised: identity problem — camera detects a raised hand but needs a way to know whose it is to send a Discord DM. Proposed 3 approaches: seat/zone registration, one camera per group, or teacher-manual assignment.
+
+---

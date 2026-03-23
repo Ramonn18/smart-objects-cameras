@@ -30,67 +30,67 @@ The class has had a participation problems, this project is trying to increase s
 
 ### In Scope
 
-<!-- What is explicitly included in this project? -->
-
--
--
--
+- Gesture detection via OAK-D camera (e.g. raised hand) to enter the participation queue
+- Sound cue played on the Raspberry Pi to acknowledge a student joining the queue (room-level feedback)
+- Discord DM sent to the student confirming their queue position ("You're #2 — you'll be called on soon")
+- Participation queue management (add, remove, display current order)
+- Teacher-facing queue view via Discord channel or bot command
 
 ### Out of Scope
 
-<!-- What are you intentionally NOT doing (for now)? -->
-
--
--
--
+- Controllable physical spotlight or directional lighting hardware
+- Face recognition or student identity tracking by appearance
+- Persistent session history or grade/participation analytics
+- Projector overlay or screen-based visual display (future consideration)
 
 ---
 
 ## Users / Audience
 
-<!-- Who will interact with this system? (students, teachers, audience, etc.) -->
+- **Students** — raise their hand (gesture) to join the queue; receive a private Discord DM confirming their spot
+- **Teacher** — sees the live queue via Discord; calls on students in order; dismisses them from the queue
+- **Classroom (ambient)** — hears the chime when a student joins, giving the room a shared moment of acknowledgment
 
 ---
 
 ## Key Features
 
-<!-- List the main features/behaviors of the finished project. -->
-
 | Feature | Description | Priority |
 |---------|-------------|----------|
-|         |             |          |
-|         |             |          |
-|         |             |          |
+| Gesture detection | OAK-D detects a raised hand or participation gesture | High |
+| Sound cue | Pi plays a chime when a student enters the queue | High |
+| Discord DM | Student receives a private message with their queue position | High |
+| Queue management | Students are added/removed in order; teacher controls via bot command | High |
+| Teacher queue view | `!queue` command shows who's waiting and in what order | Medium |
+| Queue clearing | `!next` or `!clear` command to dismiss a student or reset the queue | Medium |
 
 ---
 
 ## Hardware
 
-<!-- What physical components are needed? -->
-
 - **Camera:** Luxonis OAK-D (connected to Raspberry Pi)
-- **Raspberry Pi:** (orbit / gravity / horizon)
-- **Display / Projection:**
+- **Raspberry Pi:** orbit / gravity / horizon
+- **Audio output:** Pi's 3.5mm audio jack or HDMI audio → speaker or monitor for chime playback
+- **Display / Projection:** Not required for this scope (future consideration)
 
 ---
 
 ## Technical Approach
 
-<!-- Brief notes on how it will work technically. Fill in as you plan. -->
-
-- **Detection model:**
-- **Communication:**
-- **Output / feedback:**
+- **Detection model:** YOLO v6 (person/pose) or MediaPipe pose estimation — detect raised arm/hand gesture
+- **Communication:** Discord bot (discord.py) — sends DMs to students, posts queue updates to class channel
+- **Output / feedback:** `pygame` or `aplay` on Pi for chime playback; Discord DM for personal confirmation
+- **Queue state:** In-memory queue in the bot, optionally backed by a JSON file for persistence across restarts
 
 ---
 
 ## Open Questions
 
-<!-- Things you haven't decided yet or need to research. -->
-
--
--
--
+- What exact gesture triggers a queue entry? (full raised hand, any upward arm motion?)
+- How does the system know *which* student gestured — do students need Discord accounts linked to a seat/camera zone?
+- Does the teacher dismiss students manually (`!next`) or does the system auto-remove after a timeout?
+- Which Pi / camera covers which part of the room — one camera per zone, or one camera for the whole room?
+- What sound plays for the chime — a simple beep, a tone, or a short audio clip?
 
 ---
 
@@ -102,4 +102,4 @@ The class has had a participation problems, this project is trying to increase s
 
 ---
 
-*Last updated: 2026-03-23*
+*Last updated: 2026-03-23 — scope narrowed to sound cue + Discord DM outputs*
