@@ -5,22 +5,24 @@
 ## Project Overview
 
 <!-- What is this project? 1–3 sentences describing the core idea. -->
+This is a Smart classroom project. The overal concept is to create a student spotlight by utilizing code and avilable sofware such as lights and video cameras/ai video cameras that can determine when a student want to participate and spotlight them into queue by utilizing common gestures significant to participation.
 
 ---
 
 ## Problem Statement
 
 <!-- What problem does this solve? Who experiences it? Why does it matter? -->
-
+The class has had a participation problems, this project is trying to increase student participation by making it fun and responcive to body gestures. Some students seem to have curiosities but don't tent to participate, in here we are designing a spotlight tool that will give them the "want" to participate
 ---
 
 ## Goals
 
 <!-- What should this project accomplish? Use bullet points. -->
 
--
--
--
+-Increase student participation
+-Student notice of participation
+-Student Queue for participation
+-Advice students that there are not bad questions
 
 ---
 
