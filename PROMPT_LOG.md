@@ -67,3 +67,42 @@ A running log of prompts and responses for this project.
 **Response:** Fetched upstream (kandizzy/smart-objects-cameras) and merged into main. 73 files changed, 16,935 insertions. New additions include: classroom-api/, v-jepa/ (V-JEPA video model pipeline), pc-testing/ scripts, robot_boundary_monitor.py, docs/ slides and new markdown docs, tasks/lessons.md, and updates to CLAUDE.md, discord_bot.py, person_detector.py, and whiteboard readers. No conflicts — Student_Spotlight/ work untouched.
 
 ---
+
+### Prompt 5
+**User:** I have now written about Project Overview, Problem Statement, and Goals
+
+**Response:** Read the updated README.md. Acknowledged the written content — problem (participation anxiety) and gesture-based queue concept are well defined. Offered observations on strengths and suggested the natural next sections to fill: Scope (in/out), Users/Audience, Key Features, and Open Questions — with specific prompts drawn from what was already written.
+
+---
+
+### Prompt 6
+**User:** stop
+
+**Response:** Stopped mid-task as requested.
+
+---
+
+## Session: 2026-03-23 (continued)
+
+---
+
+### Prompt 1
+**User:** start
+
+**Response:** Started new session block and began logging.
+
+---
+
+### Prompt 2
+**User:** now this being the base of the project lets take a minute and narrow down the scope. there are things we dont have hardware wise, and that is control over where the light points. what other solution can we have for this?
+
+**Response:** Identified available hardware (OAK-D, Pis, Discord, projector) and proposed 5 alternatives to a controllable spotlight: (1) Discord as the stage — public bot post with queue position and snapshot, (2) Projector overlay — display queue on wall/screen, (3) Sound cue — chime on gesture detection, (4) Discord DM — private queue confirmation to student, (5) USB LED strip — color changes to reflect queue state. Recommended Discord + projector overlay as the strongest fit.
+
+---
+
+### Prompt 3
+**User:** keep the prompt log automatically updated
+
+**Response:** Noted — logging this and all future prompts/responses going forward without being reminded.
+
+---
